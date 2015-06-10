@@ -39,7 +39,30 @@ for i in range(5):
 
 wm.ir.register_callback(print_ir)"""
 
+def lightUpLEDs(arr):
+    for i in range(4):
+        wm.leds[i] = False
+    for i in range(len(arr)):
+        c = arr[i]
+        wm.leds[c] = True
+
+def checkHorizontal(bubVal):
+    if isYaxis:
+        if bubVal == 410 or bubVal == 610:
+            wm.rumble(0.5)
+            for i in range(4):
+                wm.leds[i] = True
+            time.sleep(0.5)
+    if isXaxis:
+        if bubVal == 510:
+            wm.rumble(0.5)
+            for i in range(4):
+                wm.leds[i] = True
+            time.sleep(0.5)
 while True:
+    bubVal = wm.accelerometer[1]
+    checkHorizontal(bubVal)
+
     if wm.buttons["Left"] or wm.buttons["Right"]:
         isXaxis = True
         isYaxis = False
@@ -50,64 +73,39 @@ while True:
         isYaxis = True
         print ("Y-Axis now enabled")
 
-    if isYaxis:
-        if wm.accelerometer[1] == 410 or wm.accelerometer[1] == 610:
-            wm.rumble(0.5)
-            for i in range(4):
-                wm.leds[i] = True
-            time.sleep(0.5)
-    if isXaxis:
-        if wm.accelerometer[1] == 510:
-            wm.rumble(0.5)
-            for i in range(4):
-                wm.leds[i] = True
-            time.sleep(0.5)
 
     if wm.buttons["A"]:
         wm.leds[1] = True
         wm.rumble(0.1)
         print((wm.accelerometer))
     else:
-        for i in range(4):
-                wm.leds[i] = False
         if isXaxis:
-            if wm.accelerometer[1] > 577:
-                wm.leds[3] = True
-            if wm.accelerometer[1] <= 577 and wm.accelerometer[1] > 544:
-                wm.leds[3] = True
-                wm.leds[2] = True
-            if wm.accelerometer[1] <= 544 and wm.accelerometer[1] > 510:
-                wm.leds[3] = True
-                wm.leds[2] = True
-                wm.leds[1] = True
-            if wm.accelerometer[1] < 443:
-                wm.leds[0] = True
-            if wm.accelerometer[1] >= 443 and wm.accelerometer[1] < 476:
-                wm.leds[0] = True
-                wm.leds[1] = True
-            if wm.accelerometer[1] >= 476 and wm.accelerometer[1] < 510:
-                wm.leds[0] = True
-                wm.leds[1] = True
-                wm.leds[2] = True
+            if bubVal > 577:
+                leds = [3]
+            if bubVal <= 577 and bubVal > 544:
+                leds = [3,2]
+            if bubVal <= 544 and bubVal > 510:
+                leds = [3,2,1]
+            if bubVal < 443:
+                leds = [0]
+            if bubVal >= 443 and bubVal < 476:
+                leds = [0, 1]
+            if bubVal >= 476 and bubVal < 510:
+                leds = [0,1,2]
         if isYaxis:
-            if wm.accelerometer[1] < 610 and wm.accelerometer[1] > 577:
-                wm.leds[0] = True
-                wm.leds[1] = True
-                wm.leds[2] = True
-            if wm.accelerometer[1] <= 577 and wm.accelerometer[1] > 544:
-                wm.leds[0] = True
-                wm.leds[1] = True
-            if wm.accelerometer[1] <= 544 and wm.accelerometer[1] > 511:
-                wm.leds[0] = True
-            if wm.accelerometer[1] <= 511 and wm.accelerometer[1] > 478:
-                wm.leds[3] = True
-            if wm.accelerometer[1] <= 478 and wm.accelerometer[1] > 445:
-                wm.leds[3] = True
-                wm.leds[2] = True
-            if wm.accelerometer[1] <= 445 and wm.accelerometer[1] > 410:
-                wm.leds[3] = True
-                wm.leds[2] = True
-                wm.leds[1] = True
+            if bubVal < 610 and bubVal > 577:
+                leds = [0,1,2]
+            if bubVal <= 577 and bubVal > 544:
+                leds = [0,1]
+            if bubVal <= 544 and bubVal > 511:
+                leds = [0]
+            if bubVal <= 511 and bubVal > 478:
+                leds = [3]
+            if bubVal <= 478 and bubVal > 445:
+                leds = [3,2]
+            if bubVal <= 445 and bubVal > 410:
+                leds = [3,2,1]
+        lightUpLEDs(leds)
         pass
     time.sleep(0.05)
 
