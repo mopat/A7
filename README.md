@@ -20,4 +20,4 @@ wiimote_node.py contains a Wiimote node for PyQtGraph:
 
 ~~~~
 python wiimote_node.py # runs demo
-~~~~ 
+~~~~

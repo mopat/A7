@@ -41,6 +41,7 @@ DEBUG = False
 KNOWN_DEVICES = ['Nintendo RVL-CNT-01', 'Nintendo RVL-CNT-01-TR']
 
 
+
 def find():
     """
     Uses Bluetooth SDP to find available Wiimotes.
