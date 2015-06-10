@@ -71,40 +71,40 @@ while True:
         for i in range(4):
                 wm.leds[i] = False
         if isXaxis:
-            if wm.accelerometer[1] > 585:
+            if wm.accelerometer[1] > 577:
                 wm.leds[3] = True
-            if wm.accelerometer[1] < 585 and wm.accelerometer[1] > 560:
+            if wm.accelerometer[1] <= 577 and wm.accelerometer[1] > 544:
                 wm.leds[3] = True
                 wm.leds[2] = True
-            if wm.accelerometer[1] < 560 and wm.accelerometer[1] > 510:
+            if wm.accelerometer[1] <= 544 and wm.accelerometer[1] > 510:
                 wm.leds[3] = True
                 wm.leds[2] = True
                 wm.leds[1] = True
-            if wm.accelerometer[1] < 435:
+            if wm.accelerometer[1] < 443:
                 wm.leds[0] = True
-            if wm.accelerometer[1] > 435 and wm.accelerometer[1] < 460:
+            if wm.accelerometer[1] >= 443 and wm.accelerometer[1] < 476:
                 wm.leds[0] = True
                 wm.leds[1] = True
-            if wm.accelerometer[1] > 460 and wm.accelerometer[1] < 510:
+            if wm.accelerometer[1] >= 476 and wm.accelerometer[1] < 510:
                 wm.leds[0] = True
                 wm.leds[1] = True
                 wm.leds[2] = True
         if isYaxis:
-            if wm.accelerometer[1] < 610 and wm.accelerometer[1] > 560:
+            if wm.accelerometer[1] < 610 and wm.accelerometer[1] > 577:
                 wm.leds[0] = True
                 wm.leds[1] = True
                 wm.leds[2] = True
-            if wm.accelerometer[1] < 560 and wm.accelerometer[1] > 535:
+            if wm.accelerometer[1] <= 577 and wm.accelerometer[1] > 544:
                 wm.leds[0] = True
                 wm.leds[1] = True
-            if wm.accelerometer[1] < 535 and wm.accelerometer[1] > 510:
+            if wm.accelerometer[1] <= 544 and wm.accelerometer[1] > 511:
                 wm.leds[0] = True
-            if wm.accelerometer[1] < 510 and wm.accelerometer[1] > 485:
+            if wm.accelerometer[1] <= 511 and wm.accelerometer[1] > 478:
                 wm.leds[3] = True
-            if wm.accelerometer[1] < 485 and wm.accelerometer[1] > 460:
+            if wm.accelerometer[1] <= 478 and wm.accelerometer[1] > 445:
                 wm.leds[3] = True
                 wm.leds[2] = True
-            if wm.accelerometer[1] < 460 and wm.accelerometer[1] > 410:
+            if wm.accelerometer[1] <= 445 and wm.accelerometer[1] > 410:
                 wm.leds[3] = True
                 wm.leds[2] = True
                 wm.leds[1] = True
