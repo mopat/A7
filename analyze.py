@@ -39,13 +39,13 @@ if __name__ == '__main__':
     pw1Node.setPlot(pw1)
 
     pw2 = pg.PlotWidget()
-    layout.addWidget(pw2, 0, 1)
+    layout.addWidget(pw2, 0, 2)
     pw2.setYRange(0,1024)
     pw2Node = fc.createNode('PlotWidget', pos=(0, -150))
     pw2Node.setPlot(pw2)
 
     pw3 = pg.PlotWidget()
-    layout.addWidget(pw3, 0, 1)
+    layout.addWidget(pw3, 0, 3)
     pw3.setYRange(0,1024)
     pw3Node = fc.createNode('PlotWidget', pos=(0, -150))
     pw3Node.setPlot(pw3)
@@ -56,8 +56,12 @@ if __name__ == '__main__':
     wiimoteNode.btaddr = an.btaddr
 
     wiimoteNode.connect_wiimote()
-
-    wiimoteNode.set_update_rate(wiimoteNode.update_rate_input.value())
+    """
+    fNode = fc.createNode('GaussianFilter', pos=(0, 0))
+    fNode.ctrls['sigma'].setValue(5)
+    fc.connectTerminals(pw1Node['dataOut'], fNode['dataIn'])
+    fc.connectTerminals(fNode['dataOut'], pw2Node['In'])
+    """
 
     bufferNodeX = fc.createNode('Buffer', pos=(150, 0))
     bufferNodeY = fc.createNode('Buffer', pos=(150, 0))
@@ -70,6 +74,7 @@ if __name__ == '__main__':
     fc.connectTerminals(bufferNodeX['dataOut'], pw1Node['In'])
     fc.connectTerminals(bufferNodeY['dataOut'], pw2Node['In'])
     fc.connectTerminals(bufferNodeZ['dataOut'], pw3Node['In'])
+
 
     win.show()
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
