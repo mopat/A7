@@ -35,9 +35,21 @@ if __name__ == '__main__':
     pw1 = pg.PlotWidget()
     layout.addWidget(pw1, 0, 1)
     pw1.setYRange(0,1024)
-
     pw1Node = fc.createNode('PlotWidget', pos=(0, -150))
     pw1Node.setPlot(pw1)
+
+    pw2 = pg.PlotWidget()
+    layout.addWidget(pw2, 0, 1)
+    pw2.setYRange(0,1024)
+    pw2Node = fc.createNode('PlotWidget', pos=(0, -150))
+    pw2Node.setPlot(pw2)
+
+    pw3 = pg.PlotWidget()
+    layout.addWidget(pw3, 0, 1)
+    pw3.setYRange(0,1024)
+    pw3Node = fc.createNode('PlotWidget', pos=(0, -150))
+    pw3Node.setPlot(pw3)
+
 
     wiimoteNode = fc.createNode('Wiimote', pos=(0, 0), )
     wiimoteNode.text.setText(an.btaddr)
@@ -47,10 +59,17 @@ if __name__ == '__main__':
 
     wiimoteNode.set_update_rate(wiimoteNode.update_rate_input.value())
 
-    bufferNode = fc.createNode('Buffer', pos=(150, 0))
+    bufferNodeX = fc.createNode('Buffer', pos=(150, 0))
+    bufferNodeY = fc.createNode('Buffer', pos=(150, 0))
+    bufferNodeZ = fc.createNode('Buffer', pos=(150, 0))
 
-    fc.connectTerminals(wiimoteNode['accelX'], bufferNode['dataIn'])
-    fc.connectTerminals(bufferNode['dataOut'], pw1Node['In'])
+    fc.connectTerminals(wiimoteNode['accelX'], bufferNodeX['dataIn'])
+    fc.connectTerminals(wiimoteNode['accelY'], bufferNodeY['dataIn'])
+    fc.connectTerminals(wiimoteNode['accelZ'], bufferNodeZ['dataIn'])
+
+    fc.connectTerminals(bufferNodeX['dataOut'], pw1Node['In'])
+    fc.connectTerminals(bufferNodeY['dataOut'], pw2Node['In'])
+    fc.connectTerminals(bufferNodeZ['dataOut'], pw3Node['In'])
 
     win.show()
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
