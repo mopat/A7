@@ -113,12 +113,14 @@ class WiimoteNode(Node):
         return self.ui
         
     def connect_wiimote(self):
-        self.btaddr = str(self.text.text()).strip()
+
+        print (self.btaddr)
+        #self.btaddr = str(self.text.text()).strip()
         if self.wiimote is not None:
             self.wiimote.disconnect()
             self.wiimote = None
             self.connect_button.setText("connect")
-            return 
+            return
         if len(self.btaddr) == 17 :
             self.connect_button.setText("connecting...")
             self.wiimote = wiimote.connect(self.btaddr)
