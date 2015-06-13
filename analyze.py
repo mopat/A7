@@ -4,13 +4,7 @@ import wiimote_node as wmn
 import time
 import sys
 
-from pyqtgraph.flowchart import Flowchart, Node
-from pyqtgraph.flowchart.library.common import CtrlNode
-import pyqtgraph.flowchart.library as fclib
-from pyqtgraph.Qt import QtGui, QtCore
-import pyqtgraph as pg
-import numpy as np
-import wiimote
+from wiimote_node import *
 
 class Analyze():
     def __init__(self):
@@ -46,6 +40,7 @@ if __name__ == '__main__':
     pw1Node.setPlot(pw1)
 
     wiimoteNode = fc.createNode('Wiimote', pos=(0, 0), )
+    wiimoteNode.text.setText(an.btaddr)
     wiimoteNode.btaddr = an.btaddr
 
     wiimoteNode.connect_wiimote()

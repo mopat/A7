@@ -89,7 +89,6 @@ class WiimoteNode(Node):
         self.connect_button.clicked.connect(self.connect_wiimote)
         self.layout.addWidget(self.connect_button)
         self.ui.setLayout(self.layout)
-       
         # update timer
         self.update_timer = QtCore.QTimer()
         self.update_timer.timeout.connect(self.update_all_sensors)
@@ -115,7 +114,7 @@ class WiimoteNode(Node):
     def connect_wiimote(self):
 
         print (self.btaddr)
-        #self.btaddr = str(self.text.text()).strip()
+        self.btaddr = str(self.text.text()).strip()
         if self.wiimote is not None:
             self.wiimote.disconnect()
             self.wiimote = None
@@ -137,13 +136,15 @@ class WiimoteNode(Node):
         else:
             self.wiimote.accelerometer.unregister_callback(self.update_accel)
             self.update_timer.start(1000.0/rate)
+        print("UPDATE")
 
     def process(self, **kwdargs):
         x,y,z = self._acc_vals
         return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z])}
         
 fclib.registerNodeType(WiimoteNode, [('Sensor',)])
-def main():
+
+if __name__ == '__main__':
     import sys
     app = QtGui.QApplication([])
     win = QtGui.QMainWindow()
@@ -176,6 +177,3 @@ def main():
     win.show()
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
-
-if __name__ == '__main__':
-    main()
