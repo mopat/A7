@@ -156,7 +156,7 @@ if __name__ == '__main__':
     fc = Flowchart(terminals={
     })
     w = fc.widget()
-
+    print("NODE CONNECT")
     layout.addWidget(fc.widget(), 0, 0, 2, 1)
 
     pw1 = pg.PlotWidget()
