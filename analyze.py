@@ -13,4 +13,4 @@ class Analyze():
 
 if __name__ == '__main__':
     an = Analyze()
-    wmn = wmn.WiimoteNode("Wiimote")
+    wmn.main()

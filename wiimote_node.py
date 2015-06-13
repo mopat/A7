@@ -141,8 +141,7 @@ class WiimoteNode(Node):
         return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z])}
         
 fclib.registerNodeType(WiimoteNode, [('Sensor',)])
-    
-if __name__ == '__main__':
+def main():
     import sys
     app = QtGui.QApplication([])
     win = QtGui.QMainWindow()
@@ -156,7 +155,7 @@ if __name__ == '__main__':
     fc = Flowchart(terminals={
     })
     w = fc.widget()
-    print("NODE CONNECT")
+
     layout.addWidget(fc.widget(), 0, 0, 2, 1)
 
     pw1 = pg.PlotWidget()
@@ -175,3 +174,6 @@ if __name__ == '__main__':
     win.show()
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
+
+if __name__ == '__main__':
+    main()
