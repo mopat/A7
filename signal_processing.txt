@@ -1,0 +1,9 @@
+What is random noise?
+
+Random noise is a form of noise consisting of large numbers of frequent, short-living impulses, or disturbances, which occur at statistically random time intervals.
+
+What does a low-pass filter do in general?
+
+In general a low-pass filter passes signals with a frequency which is lower than a certain cutoff frequency, but cushions signals with a frequency above the cutoff frequency. 
+
+Is a moving average filter a low-pass or a high-pass filter? Why?
