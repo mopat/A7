@@ -164,6 +164,7 @@ if __name__ == '__main__':
     pw1 = pg.PlotWidget()
     layout.addWidget(pw1, 0, 1)
     pw1.setYRange(0,1024)
+    pw1.set
 
     pw1Node = fc.createNode('PlotWidget', pos=(0, -150))
     pw1Node.setPlot(pw1)

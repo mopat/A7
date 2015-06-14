@@ -13,9 +13,6 @@ class Analyze():
             self.btaddr = sys.argv[1]
 
 if __name__ == '__main__':
-    import sys
-
-
     an = Analyze()
     app = QtGui.QApplication([])
     win = QtGui.QMainWindow()
