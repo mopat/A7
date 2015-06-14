@@ -89,6 +89,7 @@ class WiimoteNode(Node):
         self.connect_button.clicked.connect(self.connect_wiimote)
         self.layout.addWidget(self.connect_button)
         self.ui.setLayout(self.layout)
+       
         # update timer
         self.update_timer = QtCore.QTimer()
         self.update_timer.timeout.connect(self.update_all_sensors)
@@ -112,14 +113,12 @@ class WiimoteNode(Node):
         return self.ui
         
     def connect_wiimote(self):
-
-        print (self.btaddr)
         self.btaddr = str(self.text.text()).strip()
         if self.wiimote is not None:
             self.wiimote.disconnect()
             self.wiimote = None
             self.connect_button.setText("connect")
-            return
+            return 
         if len(self.btaddr) == 17 :
             self.connect_button.setText("connecting...")
             self.wiimote = wiimote.connect(self.btaddr)
@@ -136,14 +135,13 @@ class WiimoteNode(Node):
         else:
             self.wiimote.accelerometer.unregister_callback(self.update_accel)
             self.update_timer.start(1000.0/rate)
-        print("UPDATE")
 
     def process(self, **kwdargs):
         x,y,z = self._acc_vals
         return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z])}
         
 fclib.registerNodeType(WiimoteNode, [('Sensor',)])
-
+    
 if __name__ == '__main__':
     import sys
     app = QtGui.QApplication([])
@@ -164,7 +162,6 @@ if __name__ == '__main__':
     pw1 = pg.PlotWidget()
     layout.addWidget(pw1, 0, 1)
     pw1.setYRange(0,1024)
-    pw1.set
 
     pw1Node = fc.createNode('PlotWidget', pos=(0, -150))
     pw1Node.setPlot(pw1)
