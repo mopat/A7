@@ -15,7 +15,7 @@ class Analyze():
         app = QtGui.QApplication([])
         # create layout
         self.win = QtGui.QMainWindow()
-        self.win.setWindowTitle('Wiimote Analayzer')
+        self.win.setWindowTitle('Wiimote Frequalyzer')
         self.cw = QtGui.QWidget()
         self.win.setCentralWidget(self.cw)
         self.layout = QtGui.QGridLayout()
@@ -86,14 +86,19 @@ class Analyze():
         self.fc.connectTerminals(bufferNodeY['dataOut'], self.pw2Node['In'])
         self.fc.connectTerminals(bufferNodeZ['dataOut'], self.pw3Node['In'])
 
-    #create filter nodes
-    def filterNodes(self):
-        # Denoise Filter node
-        self.fNode = self.fc.createNode('DenoiseFilter', pos=(0, 150))
-
-        # gaussion Filter node
-        self.fNode = self.fc.createNode('GaussianFilter', pos=(150, 150))
-        self.fNode.ctrls['sigma'].setValue(5)
 
 if __name__ == '__main__':
     an = Analyze()
+
+class FFTNode(Node):
+
+    nodeName = "FFT"
+
+    def __init__(self, name):
+        test = "test"
+        print test
+
+fclib.registerNodeType(FFTNode, [('Data',)])
+
+
+
