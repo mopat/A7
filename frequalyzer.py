@@ -94,9 +94,37 @@ class FFTNode(Node):
 
     nodeName = "FFT"
 
-    def __init__(self, name):
-        test = "test"
-        print test
+    def __init__(self,
+             win,
+             nSamples,
+             aData,
+             sRate,
+             wFunction,
+             zStart = 0):
+        self.nSamples = nSamples    # Number of Sample must be a 2^n power
+        self.aData = aData          # Amplitude data array
+        self.sRate = sRate          # Sample Rate
+        self.wFunction = wFunction  # Windowing Function
+        self.zStart = zStart        # Start of Zoom Window if Used
+        self.zStop = nSamples/2     # End of Zoom Window if Used
+        # Instantiate a plot window within an existing pyQtGraph window.
+        self.plot = win.addPlot(title="FFT")
+        self.update(aData)
+        self.grid_state()
+
+        self.plot.setLabel('left', 'Amplitude', 'Volts')
+        self.plot.setLabel('bottom', 'Frequency', 'Hz')
+
+    def update(self, aData):
+        x = np.fft.fft(aData,)
+        amplitude = np.absolute(x)
+        fScale = np.linspace(0 , 50000, self.nSamples)
+        self.plot.plot(amplitude)
+        # Calculate and set-up X axis
+        self.plot.setXRange(SampleSize/2, 0)
+
+    def grid_state(self, x = True, y = True):
+        self.plot.showGrid(x, y)
 
 fclib.registerNodeType(FFTNode, [('Data',)])
 
