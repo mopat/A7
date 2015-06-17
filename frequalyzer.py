@@ -28,6 +28,12 @@ class FFTNode(Node):
 
         self.fftArray = np.array([])
 
+        self.plot = pg.plot(title = "FFT")
+        self.plot.setLabel('left', 'Amplitude')
+        self.plot.setLabel('bottom', 'Frequency', 'Hz')
+
+        self.grid_state()
+
         #self.update(self.fftArray)
         #self.grid_state()
 
@@ -49,9 +55,18 @@ class FFTNode(Node):
         x = np.fft.fft(self.fftArray)
         amplitude = np.absolute(x)
 
-        print (x)
-        print (amplitude)
 
+        n = len(self.fftArray)
+        k = np.arange(n)
+
+        T = n/10
+
+        frq = k/T * 1000
+
+        print (frq)
+
+        self.plot.plot(x = frq, y = amplitude, pen={'color': (1, 1, 1), 'width': 2})
+        self.plot.setXRange(frq/2, 0)
         return {'dataOutX': x, 'dataOutY': amplitude}
 
 
@@ -61,10 +76,10 @@ class FFTNode(Node):
         fScale = np.linspace(0 , 50000, self.nSamples)
         self.plot.plot(amplitude)
         # Calculate and set-up X axis
-        self.plot.setXRange(SampleSize/2, 0)
+        self.plot.setXRange(SampleSize/2, 0)"""
 
     def grid_state(self, x = True, y = True):
-        self.plot.showGrid(x, y)"""
+        self.plot.showGrid(x, y)
 
 fclib.registerNodeType(FFTNode, [('Data',)])
 
@@ -160,7 +175,7 @@ class Analyze():
 
         self.fc.connectTerminals(self.bufferNodeX['dataOut'], self.fftNode['dataIn'])
 
-        self.fc.connectTerminals(self.fftNode['dataOutX'], self.pw1Node['In'])
+        #self.fc.connectTerminals(self.fftNode['dataOutX'], self.pw1Node['In'])
         #self.fc.connectTerminals(self.fftNode['dataOutY'], self.pw1Node['In'])
 
 if __name__ == '__main__':
