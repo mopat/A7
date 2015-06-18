@@ -3,9 +3,59 @@
 import wiimote_node as wmn
 import time
 import sys
-
+import numpy as np
 from wiimote_node import *
 
+
+class StdDevNode(Node):
+    nodeName = "StdDev"
+
+    def __init__(self, name):
+
+        terminals = {
+            'dataIn': dict(io='in'),
+            'dataOut': dict(io='out')
+        }
+
+        self.stdDevArray = np.array([])
+
+        Node.__init__(self, name, terminals=terminals)
+
+    def process(self, **kwds):
+
+        self.stdDevArray = np.append(self.stdDevArray, kwds['dataIn'])
+
+        stdDev = np.std(self.stdDevArray, dtype=np.float64)
+
+        #print (stdDev)
+
+        return {'dataOut': stdDev}
+
+
+fclib.registerNodeType(StdDevNode, [('Data')])
+
+class NumberDisplayNode(Node):
+    nodeName = "NumberDisplay"
+
+    def __init__(self, name):
+
+        terminals = {
+            'dataIn': dict(io='in'),
+            'dataOut': dict(io='out')
+        }
+
+        Node.__init__(self, name, terminals=terminals)
+
+    def process(self, **kwds):
+        values = 1
+
+        Analyze.getLcdValues(self, kwds['dataIn'])
+
+
+
+
+
+fclib.registerNodeType(NumberDisplayNode, [('Data')])
 
 class Analyze():
     def __init__(self):
@@ -32,10 +82,15 @@ class Analyze():
         self.layout.addWidget(self.fc.widget(), 0, 0, 2, 1)
 
         # use bottom defined functions to create widgets, plotting and nodes
-        self.createWidgets()
+        #self.createWidgets()
         self.wiimoteNode()
         self.bufferPlots()
-        self.filterNodes()
+
+        self.lcdWidget = QtGui.QLCDNumber()
+        self.layout.addWidget(self.lcdWidget, 0, 0)
+
+        self.stdDevNode()
+        self.numberDisplayNode()
 
         self.win.show()
         if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
@@ -43,23 +98,25 @@ class Analyze():
 
     # create plotwidgets
     def createWidgets(self):
-        self.pw1 = pg.PlotWidget()
-        self.layout.addWidget(self.pw1, 0, 1)
-        self.pw1.setYRange(0, 1024)
-        self.pw1Node = self.fc.createNode('PlotWidget', pos=(150, -150))
-        self.pw1Node.setPlot(self.pw1)
 
-        self.pw2 = pg.PlotWidget()
-        self.layout.addWidget(self.pw2, 0, 2)
-        self.pw2.setYRange(0, 1024)
-        self.pw2Node = self.fc.createNode('PlotWidget', pos=(300, -150))
-        self.pw2Node.setPlot(self.pw2)
+        #self.lcdWidget = QtGui.QLCDNumber()
+        #self.layout.addWidget(self.lcdWidget, 0, 0)
 
-        self.pw3 = pg.PlotWidget()
-        self.layout.addWidget(self.pw3, 0, 3)
-        self.pw3.setYRange(0, 1024)
-        self.pw3Node = self.fc.createNode('PlotWidget', pos=(450, -150))
-        self.pw3Node.setPlot(self.pw3)
+        print ("test")
+
+    def getLcdValues(self, values):
+        print(values)
+
+        self.layout.addWidget(self.lcdWidget, 0, 0)
+
+
+        #Analyze.displayLcd(values)
+        #self.lcdWidget.display(values)
+
+    def displayLcd(self, values):
+
+
+        self.lcdWidget.display(values)
 
     # create node for wiimote
     def wiimoteNode(self):
@@ -72,28 +129,24 @@ class Analyze():
     # plot the buffers for the accelerometer data
     def bufferPlots(self):
         # buffers for x, y and z-Axis
-        bufferNodeX = self.fc.createNode('Buffer', pos=(150, 0))
-        bufferNodeY = self.fc.createNode('Buffer', pos=(300, 0))
-        bufferNodeZ = self.fc.createNode('Buffer', pos=(450, 0))
+        self.bufferNodeX = self.fc.createNode('Buffer', pos=(150, 0))
 
         # connect buffers to the plots
-        self.fc.connectTerminals(self.wiimoteNode['accelX'], bufferNodeX['dataIn'])
-        self.fc.connectTerminals(self.wiimoteNode['accelY'], bufferNodeY['dataIn'])
-        self.fc.connectTerminals(self.wiimoteNode['accelZ'], bufferNodeZ['dataIn'])
+        self.fc.connectTerminals(self.wiimoteNode['accelX'], self.bufferNodeX['dataIn'])
 
         # display buffer data in the plots
-        self.fc.connectTerminals(bufferNodeX['dataOut'], self.pw1Node['In'])
-        self.fc.connectTerminals(bufferNodeY['dataOut'], self.pw2Node['In'])
-        self.fc.connectTerminals(bufferNodeZ['dataOut'], self.pw3Node['In'])
+        #self.fc.connectTerminals(bufferNodeX['dataOut'], self.pw1Node['In'])
 
-    #create filter nodes
-    def filterNodes(self):
-        # Denoise Filter node
-        self.fNode = self.fc.createNode('DenoiseFilter', pos=(0, 150))
+    def stdDevNode(self):
+        self.stdDevNode = self.fc.createNode('StdDev', pos=(0, 0), )
 
-        # gaussion Filter node
-        self.fNode = self.fc.createNode('GaussianFilter', pos=(150, 150))
-        self.fNode.ctrls['sigma'].setValue(5)
+        self.fc.connectTerminals(self.bufferNodeX['dataOut'], self.stdDevNode['dataIn'])
+        #self.fc.connectTerminals(self.stdDevNode['dataOut'], self.pw1Node['In'])
+
+    def numberDisplayNode(self):
+        self.numberDisplayNode = self.fc.createNode('NumberDisplay', pos=(0, 0), )
+
+        self.fc.connectTerminals(self.stdDevNode['dataOut'], self.numberDisplayNode['dataIn'])
 
 if __name__ == '__main__':
     an = Analyze()
