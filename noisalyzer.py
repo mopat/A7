@@ -5,6 +5,10 @@ import time
 import sys
 import numpy as np
 from wiimote_node import *
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import (QLCDNumber, QSlider,
+                             QVBoxLayout)
 
 
 class StdDevNode(Node):
@@ -43,21 +47,30 @@ class NumberDisplayNode(Node):
             'dataIn': dict(io='in'),
             'dataOut': dict(io='out')
         }
-
+        self.lcdWidget = QtGui.QLCDNumber()
+        self.lcdWidget.setGeometry(300, 300, 250, 150)
+        self.lcdWidget.setWindowTitle('WordspPerMinute')
         Node.__init__(self, name, terminals=terminals)
+
+        print("init")
+
 
     def process(self, **kwds):
         values = 1
+        self.values = kwds['dataIn']
+        print(self.values)
+        #n = Noisalyze()
+        #n.getLcdValues(kwds['dataIn'])
 
-        Analyze.getLcdValues(self, kwds['dataIn'])
-
+        self.lcdWidget.display(self.values)
+        self.lcdWidget.show()
 
 
 
 
 fclib.registerNodeType(NumberDisplayNode, [('Data')])
 
-class Analyze():
+class Noisalyze():
     def __init__(self):
         self.name = "Wiimote"
         if len(sys.argv) > 1:
@@ -65,7 +78,7 @@ class Analyze():
         app = QtGui.QApplication([])
         # create layout
         self.win = QtGui.QMainWindow()
-        self.win.setWindowTitle('Wiimote Analayzer')
+        self.win.setWindowTitle('Wiimote Noisalyzer')
         self.cw = QtGui.QWidget()
         self.win.setCentralWidget(self.cw)
         self.layout = QtGui.QGridLayout()
@@ -86,8 +99,7 @@ class Analyze():
         self.wiimoteNode()
         self.bufferPlots()
 
-        self.lcdWidget = QtGui.QLCDNumber()
-        self.layout.addWidget(self.lcdWidget, 0, 0)
+
 
         self.stdDevNode()
         self.numberDisplayNode()
@@ -96,27 +108,6 @@ class Analyze():
         if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
             QtGui.QApplication.instance().exec_()
 
-    # create plotwidgets
-    def createWidgets(self):
-
-        #self.lcdWidget = QtGui.QLCDNumber()
-        #self.layout.addWidget(self.lcdWidget, 0, 0)
-
-        print ("test")
-
-    def getLcdValues(self, values):
-        print(values)
-
-        self.layout.addWidget(self.lcdWidget, 0, 0)
-
-
-        #Analyze.displayLcd(values)
-        #self.lcdWidget.display(values)
-
-    def displayLcd(self, values):
-
-
-        self.lcdWidget.display(values)
 
     # create node for wiimote
     def wiimoteNode(self):
@@ -138,15 +129,17 @@ class Analyze():
         #self.fc.connectTerminals(bufferNodeX['dataOut'], self.pw1Node['In'])
 
     def stdDevNode(self):
-        self.stdDevNode = self.fc.createNode('StdDev', pos=(0, 0), )
+        self.stdDevNode = self.fc.createNode('StdDev', pos=(300, 150), )
 
         self.fc.connectTerminals(self.bufferNodeX['dataOut'], self.stdDevNode['dataIn'])
         #self.fc.connectTerminals(self.stdDevNode['dataOut'], self.pw1Node['In'])
 
     def numberDisplayNode(self):
-        self.numberDisplayNode = self.fc.createNode('NumberDisplay', pos=(0, 0), )
+
+        self.numberDisplayNode = self.fc.createNode('NumberDisplay', pos=(450, 150), )
 
         self.fc.connectTerminals(self.stdDevNode['dataOut'], self.numberDisplayNode['dataIn'])
 
 if __name__ == '__main__':
-    an = Analyze()
+    an = Noisalyze()
+
