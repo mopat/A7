@@ -28,11 +28,16 @@ class FFTNode(Node):
 
         self.fftArray = np.array([])
 
-        self.plot = pg.plot(title = "FFT")
-        self.plot.setLabel('left', 'Amplitude')
-        self.plot.setLabel('bottom', 'Frequency', 'Hz')
+        self.pw1 = pg.plot(title='FFT')
+        #self.layout.addWidget(self.pw1, 0, 1)
 
-        self.grid_state()
+
+        #self.pw1.setPen((200,200,100))
+
+        self.pw1.setLabel('left', 'Amplitude')
+        self.pw1.setLabel('bottom', 'Frequency', 'Hz')
+
+        #self.grid_state()
 
         #self.update(self.fftArray)
         #self.grid_state()
@@ -52,21 +57,23 @@ class FFTNode(Node):
         #print (self.fftArray)
 
 
-        x = np.fft.fft(self.fftArray)
-        amplitude = np.absolute(x)
-
 
         n = len(self.fftArray)
         k = np.arange(n)
 
+        x = np.fft.fft(self.fftArray)/n
+
         T = n/10
 
-        frq = k/T * 1000
+        frq = k/T
 
-        print (frq)
+        amplitude = abs(x)
 
-        self.plot.plot(x = frq, y = amplitude, pen={'color': (1, 1, 1), 'width': 2})
-        self.plot.setXRange(frq/2, 0)
+
+        self.pw1.plot(x = frq, y = amplitude, pen={'color': (200, 200, 100), 'width': 2})
+
+        #self.pw1.setData(y=frq, x=amplitude)
+
         return {'dataOutX': x, 'dataOutY': amplitude}
 
 
@@ -78,8 +85,6 @@ class FFTNode(Node):
         # Calculate and set-up X axis
         self.plot.setXRange(SampleSize/2, 0)"""
 
-    def grid_state(self, x = True, y = True):
-        self.plot.showGrid(x, y)
 
 fclib.registerNodeType(FFTNode, [('Data',)])
 
@@ -138,11 +143,13 @@ class Analyze():
         self.pw3Node = self.fc.createNode('PlotWidget', pos=(450, -150))
         self.pw3Node.setPlot(self.pw3)"""
 
-        self.pw1 = pg.PlotWidget()
-        self.layout.addWidget(self.pw1, 0, 1)
-        self.pw1.setYRange(0, 1024)
-        self.pw1Node = self.fc.createNode('PlotWidget', pos=(150, -150))
-        self.pw1Node.setPlot(self.pw1)
+        #self.pw1 = pg.PlotWidget(name='Plot1')
+        #self.layout.addWidget(self.pw1, 0, 1)
+        print ("test")
+        #self.p1 = self.pw1.plot()
+        #self.p1.setPen((200,200,100))
+        #self.pw1Node = self.fc.createNode('PlotWidget', pos=(150, -150))
+        #self.pw1Node.setPlot(self.p1)
 
 
     # create node for wiimote

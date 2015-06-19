@@ -1,0 +1,11 @@
+The Wiimote lying on a stationary surface:
+
+    Standard Deviation: 0.4 - 0.5
+
+The Wiimote being held by a user as steadily as possible:
+
+    Standard Deviation: 0.6 - 1.0
+
+The Wiimote being swung around wildly:
+
+    Standard Deviation: 180 - 200

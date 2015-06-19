@@ -5,10 +5,9 @@ import time
 import sys
 import numpy as np
 from wiimote_node import *
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QLCDNumber, QSlider,
-                             QVBoxLayout)
+#from PyQt5 import QtCore, QtWidgets
+#from PyQt5.QtCore import Qt
+#from PyQt5.QtWidgets import (QLCDNumber, QSlider, QVBoxLayout)
 
 
 class StdDevNode(Node):
@@ -31,8 +30,6 @@ class StdDevNode(Node):
 
         stdDev = np.std(self.stdDevArray, dtype=np.float64)
 
-        #print (stdDev)
-
         return {'dataOut': stdDev}
 
 
@@ -49,7 +46,7 @@ class NumberDisplayNode(Node):
         }
         self.lcdWidget = QtGui.QLCDNumber()
         self.lcdWidget.setGeometry(300, 300, 250, 150)
-        self.lcdWidget.setWindowTitle('WordspPerMinute')
+        self.lcdWidget.setWindowTitle('Standard Deviation')
         Node.__init__(self, name, terminals=terminals)
 
         print("init")
@@ -58,10 +55,7 @@ class NumberDisplayNode(Node):
     def process(self, **kwds):
         values = 1
         self.values = kwds['dataIn']
-        print(self.values)
-        #n = Noisalyze()
-        #n.getLcdValues(kwds['dataIn'])
-
+        print (self.values)
         self.lcdWidget.display(self.values)
         self.lcdWidget.show()
 
@@ -125,14 +119,10 @@ class Noisalyze():
         # connect buffers to the plots
         self.fc.connectTerminals(self.wiimoteNode['accelX'], self.bufferNodeX['dataIn'])
 
-        # display buffer data in the plots
-        #self.fc.connectTerminals(bufferNodeX['dataOut'], self.pw1Node['In'])
-
     def stdDevNode(self):
         self.stdDevNode = self.fc.createNode('StdDev', pos=(300, 150), )
 
         self.fc.connectTerminals(self.bufferNodeX['dataOut'], self.stdDevNode['dataIn'])
-        #self.fc.connectTerminals(self.stdDevNode['dataOut'], self.pw1Node['In'])
 
     def numberDisplayNode(self):
 
