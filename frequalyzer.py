@@ -30,35 +30,13 @@ class FFTNode(Node):
 
         self.fftArray = np.array([])
 
-       # self.pw1 = pg.plot(title='FFT')
-        #self.layout.addWidget(self.pw1, 0, 1)
-
-
-        #self.pw1.setPen((200,200,100))
-
-        #self.pw1.setLabel('left', 'Amplitude')
-       # self.pw1.setLabel('bottom', 'Frequency', 'Hz')
-
-        #self.grid_state()
-
-        #self.update(self.fftArray)
-        #self.grid_state()
-
-        #self.plot.setLabel('left', 'Amplitude', 'Volts')
-        #self.plot.setLabel('bottom', 'Frequency', 'Hz')
 
         Node.__init__(self, name, terminals=terminals)
 
     def process(self, **kwds):
         # kwds will have one keyword argument per input terminal.
 
-        #size = int(self.ctrls['size'].value())
         self.fftArray = np.append(self.fftArray, kwds['dataIn'])
-        #self.fftArray = self.fftArray[-size:]
-
-        #print (self.fftArray)
-
-
 
         n = len(self.fftArray)
         k = np.arange(n)
@@ -71,12 +49,15 @@ class FFTNode(Node):
 
         amplitude = abs(x)
 
+        # intFrq = fl(frq)
+        #intAmp = int(amplitude)
+
 
         #self.pw1.plot(x = frq, y = amplitude, pen={'color': (200, 200, 100), 'width': 2})
 
         #self.pw1.setData(y=frq, x=amplitude)
 
-        return {'dataOutX': x, 'dataOutY': amplitude}
+        return {'dataOutX': frq, 'dataOutY': amplitude}
 
 
     """def update(self, fftArray):
