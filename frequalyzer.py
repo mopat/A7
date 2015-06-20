@@ -29,9 +29,7 @@ class FFTNode(Node):
         }
 
         self.fftArray = np.array([])
-
-        #push
-
+        
         Node.__init__(self, name, terminals=terminals)
 
     def process(self, **kwds):
@@ -49,14 +47,6 @@ class FFTNode(Node):
         frq = k/T
 
         amplitude = abs(x)
-
-        # intFrq = fl(frq)
-        #intAmp = int(amplitude)
-
-
-        #self.pw1.plot(x = frq, y = amplitude, pen={'color': (200, 200, 100), 'width': 2})
-
-        #self.pw1.setData(y=frq, x=amplitude)
 
         return {'dataOutX': frq, 'dataOutY': amplitude}
 
@@ -110,48 +100,31 @@ class Frequalyzer():
 
     # create plotwidgets
     def createWidgets(self):
-        """self.pw1 = pg.PlotWidget()
-        self.layout.addWidget(self.pw1, 0, 1)
-        self.pw1.setYRange(0, 1024)
-        self.pw1Node = self.fc.createNode('PlotWidget', pos=(150, -150))
-        self.pw1Node.setPlot(self.pw1)
 
-        self.pw2 = pg.PlotWidget()
-        self.layout.addWidget(self.pw2, 0, 2)
-        self.pw2.setYRange(0, 1024)
-        self.pw2Node = self.fc.createNode('PlotWidget', pos=(300, -150))
-        self.pw2Node.setPlot(self.pw2)
-
-        self.pw3 = pg.PlotWidget()
-        self.layout.addWidget(self.pw3, 0, 3)
-        self.pw3.setYRange(0, 1024)
-        self.pw3Node = self.fc.createNode('PlotWidget', pos=(450, -150))
-        self.pw3Node.setPlot(self.pw3)"""
-
-        #self.pw1 = pg.PlotWidget(name='Plot1')
-        #self.layout.addWidget(self.pw1, 0, 1)
-        print ("test")
-        #self.p1 = self.pw1.plot()
-        #self.p1.setPen((200,200,100))
-        #self.pw1Node = self.fc.createNode('PlotWidget', pos=(150, -150))
-        #self.pw1Node.setPlot(self.p1)
         self.pwX = pg.PlotWidget()
         self.layout.addWidget(self.pwX, 0, 1)
         self.pwX.setYRange(0, 50)
         self.pwXNode = self.fc.createNode('PlotWidget', pos=(450, -150))
         self.pwXNode.setPlot(self.pwX)
+        self.pwX.setLabel('left', 'Amplitude')
+        self.pwX.setLabel('bottom', 'Frequency', 'Hz')
 
         self.pwY = pg.PlotWidget()
         self.layout.addWidget(self.pwY, 0, 2)
         self.pwY.setYRange(0, 50)
         self.pwYNode = self.fc.createNode('PlotWidget', pos=(450, 0))
         self.pwYNode.setPlot(self.pwY)
+        self.pwY.setLabel('left', 'Amplitude')
+        self.pwY.setLabel('bottom', 'Frequency', 'Hz')
+
 
         self.pwZ = pg.PlotWidget()
         self.layout.addWidget(self.pwZ, 0, 3)
         self.pwZ.setYRange(0, 50)
         self.pwZNode = self.fc.createNode('PlotWidget', pos=(450, 150))
         self.pwZNode.setPlot(self.pwZ)
+        self.pwZ.setLabel('left', 'Amplitude')
+        self.pwZ.setLabel('bottom', 'Frequency', 'Hz')
 
     # create node for wiimote
     def wiimoteNode(self):
@@ -173,11 +146,6 @@ class Frequalyzer():
         self.fc.connectTerminals(self.wiimoteNode['accelY'], self.bufferNodeY['dataIn'])
         self.fc.connectTerminals(self.wiimoteNode['accelZ'], self.bufferNodeZ['dataIn'])
 
-        # display buffer data in the plots
-        #self.fc.connectTerminals(self.bufferNodeX['dataOut'], self.pw1Node['In'])
-        #self.fc.connectTerminals(self.bufferNodeY['dataOut'], self.pw2Node['In'])
-        #self.fc.connectTerminals(self.bufferNodeZ['dataOut'], self.pw3Node['In'])
-
     def fftNode(self):
         self.fftNodeX = self.fc.createNode('FFT', pos=(150, -150), )
         self.fftNodeY = self.fc.createNode('FFT', pos=(150, 0), )
@@ -185,11 +153,6 @@ class Frequalyzer():
         self.fc.connectTerminals(self.bufferNodeX['dataOut'], self.fftNodeX['dataIn'])
         self.fc.connectTerminals(self.bufferNodeY['dataOut'], self.fftNodeY['dataIn'])
         self.fc.connectTerminals(self.bufferNodeZ['dataOut'], self.fftNodeZ['dataIn'])
-
-
-
-        #self.fc.connectTerminals(self.fftNode['dataOutX'], self.pw1Node['In'])
-        #self.fc.connectTerminals(self.fftNode['dataOutY'], self.pw1Node['In'])
 
     def plotCurveNode(self):
         # create PlotCurves and connect to fftNode outputs
