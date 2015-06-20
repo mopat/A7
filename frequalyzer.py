@@ -137,19 +137,19 @@ class Frequalyzer():
         #self.pw1Node.setPlot(self.p1)
         self.pwX = pg.PlotWidget()
         self.layout.addWidget(self.pwX, 0, 1)
-        self.pwX.setYRange(0, 1024)
+        self.pwX.setYRange(0, 50)
         self.pwXNode = self.fc.createNode('PlotWidget', pos=(450, -150))
         self.pwXNode.setPlot(self.pwX)
 
         self.pwY = pg.PlotWidget()
         self.layout.addWidget(self.pwY, 0, 2)
-        self.pwY.setYRange(0, 1024)
+        self.pwY.setYRange(0, 50)
         self.pwYNode = self.fc.createNode('PlotWidget', pos=(450, 0))
         self.pwYNode.setPlot(self.pwY)
 
         self.pwZ = pg.PlotWidget()
         self.layout.addWidget(self.pwZ, 0, 3)
-        self.pwZ.setYRange(0, 1024)
+        self.pwZ.setYRange(0, 50)
         self.pwZNode = self.fc.createNode('PlotWidget', pos=(450, 150))
         self.pwZNode.setPlot(self.pwZ)
 
