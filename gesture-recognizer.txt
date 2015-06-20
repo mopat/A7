@@ -7,3 +7,7 @@ grouping points in a cloud. Because time has no importance in this way of implem
 Name an advantage of the $P recognizer over the $1 recognizer.
 The $1 recognizer has a combinatoric gesture represenation approach. For example when drawing a square there are 442 possible cases. So $1 recognizer has very high memory and execution costs.
 The $P recognizer sees the gesture as an unordered set of grouped points in a cloud without considering the time of a gesture, what leads to very low memory and execution costs.
+
+What is the minimum matching distance?
+The minimum matching distance is the best match between two point clouds C and T what can be repesented as Nearest-Neighbour classification.
+
