@@ -90,7 +90,7 @@ class FFTNode(Node):
 
 fclib.registerNodeType(FFTNode, [('Data',)])
 
-class Analyze():
+class Frequalyzer():
     def __init__(self):
         self.name = "Wiimote"
         if len(sys.argv) > 1:
@@ -229,7 +229,7 @@ class Analyze():
         self.fc.connectTerminals(self.plotCurveZ['plot'], self.pwZNode['In'])
 
 if __name__ == '__main__':
-    an = Analyze()
+    f = Frequalyzer()
 
 
 
