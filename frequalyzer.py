@@ -30,6 +30,7 @@ class FFTNode(Node):
 
         self.fftArray = np.array([])
 
+        #push
 
         Node.__init__(self, name, terminals=terminals)
 
