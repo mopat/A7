@@ -6,6 +6,8 @@ import sys
 
 from wiimote_node import *
 
+
+
 class FFTNode(Node):
 
     nodeName = "FFT"
@@ -28,14 +30,14 @@ class FFTNode(Node):
 
         self.fftArray = np.array([])
 
-        self.pw1 = pg.plot(title='FFT')
+       # self.pw1 = pg.plot(title='FFT')
         #self.layout.addWidget(self.pw1, 0, 1)
 
 
         #self.pw1.setPen((200,200,100))
 
-        self.pw1.setLabel('left', 'Amplitude')
-        self.pw1.setLabel('bottom', 'Frequency', 'Hz')
+        #self.pw1.setLabel('left', 'Amplitude')
+       # self.pw1.setLabel('bottom', 'Frequency', 'Hz')
 
         #self.grid_state()
 
@@ -70,7 +72,7 @@ class FFTNode(Node):
         amplitude = abs(x)
 
 
-        self.pw1.plot(x = frq, y = amplitude, pen={'color': (200, 200, 100), 'width': 2})
+        #self.pw1.plot(x = frq, y = amplitude, pen={'color': (200, 200, 100), 'width': 2})
 
         #self.pw1.setData(y=frq, x=amplitude)
 
@@ -118,6 +120,7 @@ class Analyze():
         self.bufferPlots()
 
         self.fftNode()
+        self.plotCurveNode()
 
         self.win.show()
         if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
@@ -150,11 +153,27 @@ class Analyze():
         #self.p1.setPen((200,200,100))
         #self.pw1Node = self.fc.createNode('PlotWidget', pos=(150, -150))
         #self.pw1Node.setPlot(self.p1)
+        self.pwX = pg.PlotWidget()
+        self.layout.addWidget(self.pwX, 0, 1)
+        self.pwX.setYRange(0, 1024)
+        self.pwXNode = self.fc.createNode('PlotWidget', pos=(450, -150))
+        self.pwXNode.setPlot(self.pwX)
 
+        self.pwY = pg.PlotWidget()
+        self.layout.addWidget(self.pwY, 0, 2)
+        self.pwY.setYRange(0, 1024)
+        self.pwYNode = self.fc.createNode('PlotWidget', pos=(450, 0))
+        self.pwYNode.setPlot(self.pwY)
+
+        self.pwZ = pg.PlotWidget()
+        self.layout.addWidget(self.pwZ, 0, 3)
+        self.pwZ.setYRange(0, 1024)
+        self.pwZNode = self.fc.createNode('PlotWidget', pos=(450, 150))
+        self.pwZNode.setPlot(self.pwZ)
 
     # create node for wiimote
     def wiimoteNode(self):
-        self.wiimoteNode = self.fc.createNode('Wiimote', pos=(0, 0), )
+        self.wiimoteNode = self.fc.createNode('Wiimote', pos=(-150, 0), )
         self.wiimoteNode.text.setText(self.btaddr)
         self.wiimoteNode.btaddr = self.btaddr  # set wiimote bluetooth adress
 
@@ -163,9 +182,9 @@ class Analyze():
     # plot the buffers for the accelerometer data
     def bufferPlots(self):
         # buffers for x, y and z-Axis
-        self.bufferNodeX = self.fc.createNode('Buffer', pos=(150, 0))
-        self.bufferNodeY = self.fc.createNode('Buffer', pos=(300, 0))
-        self.bufferNodeZ = self.fc.createNode('Buffer', pos=(450, 0))
+        self.bufferNodeX = self.fc.createNode('Buffer', pos=(0, -150))
+        self.bufferNodeY = self.fc.createNode('Buffer', pos=(0, 0))
+        self.bufferNodeZ = self.fc.createNode('Buffer', pos=(0, 150))
 
         # connect buffers to the plots
         self.fc.connectTerminals(self.wiimoteNode['accelX'], self.bufferNodeX['dataIn'])
@@ -178,12 +197,36 @@ class Analyze():
         #self.fc.connectTerminals(self.bufferNodeZ['dataOut'], self.pw3Node['In'])
 
     def fftNode(self):
-        self.fftNode = self.fc.createNode('FFT', pos=(0, 0), )
+        self.fftNodeX = self.fc.createNode('FFT', pos=(150, -150), )
+        self.fftNodeY = self.fc.createNode('FFT', pos=(150, 0), )
+        self.fftNodeZ = self.fc.createNode('FFT', pos=(150, 150), )
+        self.fc.connectTerminals(self.bufferNodeX['dataOut'], self.fftNodeX['dataIn'])
+        self.fc.connectTerminals(self.bufferNodeY['dataOut'], self.fftNodeY['dataIn'])
+        self.fc.connectTerminals(self.bufferNodeZ['dataOut'], self.fftNodeZ['dataIn'])
 
-        self.fc.connectTerminals(self.bufferNodeX['dataOut'], self.fftNode['dataIn'])
+
 
         #self.fc.connectTerminals(self.fftNode['dataOutX'], self.pw1Node['In'])
         #self.fc.connectTerminals(self.fftNode['dataOutY'], self.pw1Node['In'])
+
+    def plotCurveNode(self):
+        # create PlotCurves and connect to fftNode outputs
+        self.plotCurveX = self.fc.createNode('PlotCurve', pos=(300, -150), )
+        self.fc.connectTerminals(self.fftNodeX['dataOutX'], self.plotCurveX['x'])
+        self.fc.connectTerminals(self.fftNodeX['dataOutY'], self.plotCurveX['y'])
+
+        self.plotCurveY = self.fc.createNode('PlotCurve', pos=(300, 0), )
+        self.fc.connectTerminals(self.fftNodeY['dataOutX'], self.plotCurveY['x'])
+        self.fc.connectTerminals(self.fftNodeY['dataOutY'], self.plotCurveY['y'])
+
+        self.plotCurveZ = self.fc.createNode('PlotCurve', pos=(300, 150), )
+        self.fc.connectTerminals(self.fftNodeZ['dataOutX'], self.plotCurveZ['x'])
+        self.fc.connectTerminals(self.fftNodeZ['dataOutY'], self.plotCurveZ['y'])
+
+        # connect plotcurves to their widgets
+        self.fc.connectTerminals(self.plotCurveX['plot'], self.pwXNode['In'])
+        self.fc.connectTerminals(self.plotCurveY['plot'], self.pwYNode['In'])
+        self.fc.connectTerminals(self.plotCurveZ['plot'], self.pwZNode['In'])
 
 if __name__ == '__main__':
     an = Analyze()
