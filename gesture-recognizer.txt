@@ -1,0 +1,9 @@
+What does the recognizer do?
+The $P recognizer  avoids the storage complexity of $N by representing gestures as “clouds of Points”.
+and thus ignoring variable user behavior in terms of stroke order and direction. The $P recognizer discards the timeline of gestures what makes gestures appear
+as simple sets without any particular order associated. So the points of gesture do not necessarily follow the the previous points. Instead gestures are seen as unordered sets by
+grouping points in a cloud. Because time has no importance in this way of implementation the number of strokes, stroke ordering, and stroke direction become irrelevant.
+
+Name an advantage of the $P recognizer over the $1 recognizer.
+The $1 recognizer has a combinatoric gesture represenation approach. For example when drawing a square there are 442 possible cases. So $1 recognizer has very high memory and execution costs.
+The $P recognizer sees the gesture as an unordered set of grouped points in a cloud without considering the time of a gesture, what leads to very low memory and execution costs.
