@@ -1,14 +1,17 @@
 The Wiimote lying on a stationary surface:
+
     Standard Deviation: 0.4 - 0.5
-The Wiimote has been lying on the table and the sync has been pressed. After the Wiimote has not been moving anymore the application for
-measuring the standard deviation has been started. Waiting some time for the value to even out and getting the result.
+    
+The Wiimote has been lying on the table and the sync has been pressed. After the Wiimote has not been moving anymore the application for measuring the standard deviation has been started. Waiting some time for the value to even out and getting the result.
 
 The Wiimote being held by a user as steadily as possible:
+
     Standard Deviation: 0.8 - 1.0
-The sync button was pressed and the user had some seconds to focus on holding the Wiimote steadily. Then the application for measuring the
-standard deviation has been started. Again, waiting some time for the value to even out.
+    
+The sync button was pressed and the user had some seconds to focus on holding the Wiimote steadily. Then the application for measuring the standard deviation has been started. Again, waiting some time for the value to even out.
 
 The Wiimote being swung around wildly:
+
     Standard Deviation: 110-120
-The user was holding the Wiimote in the right hand and the sync button has been pressed. He swung the Wiimote around widely and the application
-for measuring the standard deviation has been started. The value evened out very fast.
+    
+The user was holding the Wiimote in the right hand and the sync button has been pressed. He swung the Wiimote around widely and the application for measuring the standard deviation has been started. The value evened out very fast.

@@ -10,6 +10,7 @@ from wiimote_node import *
 #from PyQt5.QtWidgets import (QLCDNumber, QSlider, QVBoxLayout)
 
 
+# Creating node for standard deviation
 class StdDevNode(Node):
     nodeName = "StdDev"
 
@@ -28,6 +29,7 @@ class StdDevNode(Node):
 
         self.stdDevArray = np.append(self.stdDevArray, kwds['dataIn'])
 
+        # Calculating standard deviation
         stdDev = np.std(self.stdDevArray, dtype=np.float64)
 
         return {'dataOut': stdDev}
@@ -35,6 +37,8 @@ class StdDevNode(Node):
 
 fclib.registerNodeType(StdDevNode, [('Data')])
 
+
+# Creating node for displaying standard deviation
 class NumberDisplayNode(Node):
     nodeName = "NumberDisplay"
 
@@ -44,25 +48,21 @@ class NumberDisplayNode(Node):
             'dataIn': dict(io='in'),
             'dataOut': dict(io='out')
         }
+        # Creating LCD widget
         self.lcdWidget = QtGui.QLCDNumber()
         self.lcdWidget.setGeometry(300, 300, 250, 150)
         self.lcdWidget.setWindowTitle('Standard Deviation')
         Node.__init__(self, name, terminals=terminals)
 
-        print("init")
-
-
     def process(self, **kwds):
         values = 1
         self.values = kwds['dataIn']
-        print (self.values)
+        # Updating LCD widget with data in
         self.lcdWidget.display(self.values)
         self.lcdWidget.show()
 
-
-
-
 fclib.registerNodeType(NumberDisplayNode, [('Data')])
+
 
 class Noisalyze():
     def __init__(self):
@@ -89,11 +89,8 @@ class Noisalyze():
         self.layout.addWidget(self.fc.widget(), 0, 0, 2, 1)
 
         # use bottom defined functions to create widgets, plotting and nodes
-        #self.createWidgets()
         self.wiimoteNode()
         self.bufferPlots()
-
-
 
         self.stdDevNode()
         self.numberDisplayNode()
@@ -101,7 +98,6 @@ class Noisalyze():
         self.win.show()
         if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
             QtGui.QApplication.instance().exec_()
-
 
     # create node for wiimote
     def wiimoteNode(self):
@@ -132,4 +128,3 @@ class Noisalyze():
 
 if __name__ == '__main__':
     an = Noisalyze()
-

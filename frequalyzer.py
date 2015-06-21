@@ -3,37 +3,28 @@
 import wiimote_node as wmn
 import time
 import sys
-
 from wiimote_node import *
 
 
-
+# Create node for fft
 class FFTNode(Node):
 
     nodeName = "FFT"
 
     def __init__(self, name):
-        """self.nSamples = nSamples    # Number of Sample must be a 2^n power
-        self.aData = aData          # Amplitude data array
-        self.sRate = sRate          # Sample Rate
-        self.wFunction = wFunction  # Windowing Function
-        self.zStart = zStart        # Start of Zoom Window if Used
-        self.zStop = nSamples/2     # End of Zoom Window if Used
-        # Instantiate a plot window within an existing pyQtGraph window.
-        self.plot = win.addPlot(title="FFT")"""
 
         terminals = {
             'dataIn': dict(io='in'),
             'dataOutX': dict(io='out'),
             'dataOutY': dict(io='out'),
         }
-
+        # Array for data in
         self.fftArray = np.array([])
-        
+
         Node.__init__(self, name, terminals=terminals)
 
+    # process data and calculate fft
     def process(self, **kwds):
-        # kwds will have one keyword argument per input terminal.
 
         self.fftArray = np.append(self.fftArray, kwds['dataIn'])
 
@@ -48,19 +39,11 @@ class FFTNode(Node):
 
         amplitude = abs(x)
 
+        # return frequency and absolute of x
         return {'dataOutX': frq, 'dataOutY': amplitude}
 
-
-    """def update(self, fftArray):
-        x = np.fft.fft(fftArray)
-        amplitude = np.absolute(x)
-        fScale = np.linspace(0 , 50000, self.nSamples)
-        self.plot.plot(amplitude)
-        # Calculate and set-up X axis
-        self.plot.setXRange(SampleSize/2, 0)"""
-
-
 fclib.registerNodeType(FFTNode, [('Data',)])
+
 
 class Frequalyzer():
     def __init__(self):
@@ -116,7 +99,6 @@ class Frequalyzer():
         self.pwYNode.setPlot(self.pwY)
         self.pwY.setLabel('left', 'Amplitude')
         self.pwY.setLabel('bottom', 'Frequency', 'Hz')
-
 
         self.pwZ = pg.PlotWidget()
         self.layout.addWidget(self.pwZ, 0, 3)
@@ -175,6 +157,3 @@ class Frequalyzer():
 
 if __name__ == '__main__':
     f = Frequalyzer()
-
-
-
