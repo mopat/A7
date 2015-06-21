@@ -45,8 +45,7 @@ class NumberDisplayNode(Node):
     def __init__(self, name):
 
         terminals = {
-            'dataIn': dict(io='in'),
-            'dataOut': dict(io='out')
+            'dataIn': dict(io='in')
         }
         # Creating LCD widget
         self.lcdWidget = QtGui.QLCDNumber()
