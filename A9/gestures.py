@@ -6,7 +6,6 @@ import sys
 
 from wiimote_node import *
 
-
 class Analyze():
     def __init__(self):
         self.name = "Wiimote"
@@ -34,33 +33,44 @@ class Analyze():
         # use bottom defined functions to create widgets, plotting and nodes
         #self.createWidgets()
         self.wiimoteNode()
-        #self.bufferPlots()
-        #self.filterNodes()
-        self.gestureRunning = False
 
+        self.gestureRunning = False
+        self.x = []
+        self.y = []
 
         self.win.show()
 
-        self.pw1 = pg.PlotWidget()
-        self.layout.addWidget(self.pw1, 0, 1)
-        self.pw1.setYRange(0, 1024)
-        self.pw1Node = self.fc.createNode('PlotWidget', pos=(150, -150))
-        self.pw1Node.setPlot(self.pw1)
 
         while True:
-            self.printIrData(self.wiimoteNode.wiimote.ir)
+
             #print(self.wiimoteNode.wiimote.ir)
-            if self.wiimoteNode.wiimote.buttons["A"]:
+            while self.wiimoteNode.wiimote.buttons["A"]:
+                 self.gestureRunning = True
+                 self.printIrData(self.wiimoteNode.wiimote.ir)
+            if self.wiimoteNode.wiimote.buttons["A"] == False:
+                self.gestureRunning = False
+                print("gestureEnd")
+                print(self.x)
+                print(self.y)
+
+
+            '''if self.wiimoteNode.wiimote.buttons["A"]:
+
                 if self.gestureRunning == False:
                     self.wiimoteNode.wiimote.leds[1] = True
                     self.wiimoteNode.wiimote.rumble(0.1)
                     self.gestureRunning = True
+                    self.printIrData(self.wiimoteNode.wiimote.ir)
                     print("gestureStart")
                     #print((wm.accelerometer))
             elif self.wiimoteNode.wiimote.buttons["A"] == False:
                 if self.gestureRunning == True:
                     self.gestureRunning = False
                     print("gestureEnd")
+                    print(self.x)
+                    print(self.y)
+                    '''
+
 
             time.sleep(0.05)
 
@@ -71,11 +81,17 @@ class Analyze():
         self.wiimoteNode.wiimote.ir.register_callback(self.print_ir)
 
     def printIrData(self, ir_data):
-        if len(ir_data) == 0:
-            return
-        for ir_obj in ir_data:
-            #print("%4d %4d %2d     " % (ir_obj["x"],ir_obj["y"],ir_obj["size"]), end=' ')
-            print("%4d %4d %2d     " % (ir_obj["x"],ir_obj["y"],ir_obj["size"]))
+        while self.gestureRunning:
+
+            print("GESTURERUNNING")
+            if len(ir_data) == 0:
+                return
+            for ir_obj in ir_data:
+                #print("%4d %4d %2d     " % (ir_obj["x"],ir_obj["y"],ir_obj["size"]), end=' ')
+                print("%4d %4d %2d     " % (ir_obj["x"],ir_obj["y"],ir_obj["size"]))
+                self.x.append(ir_obj["x"])
+                self.y.append(ir_obj["y"])
+
     # create plotwidgets
     def createWidgets(self):
         self.pw1 = pg.PlotWidget()
@@ -121,14 +137,6 @@ class Analyze():
         self.fc.connectTerminals(bufferNodeY['dataOut'], self.pw2Node['In'])
         self.fc.connectTerminals(bufferNodeZ['dataOut'], self.pw3Node['In'])
 
-    #create filter nodes
-    def filterNodes(self):
-        # Denoise Filter node
-        self.fNode = self.fc.createNode('DenoiseFilter', pos=(0, 150))
-
-        # gaussion Filter node
-        self.fNode = self.fc.createNode('GaussianFilter', pos=(150, 150))
-        self.fNode.ctrls['sigma'].setValue(5)
 
 if __name__ == '__main__':
     an = Analyze()
