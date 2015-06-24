@@ -46,30 +46,12 @@ class Analyze():
             #print(self.wiimoteNode.wiimote.ir)
             while self.wiimoteNode.wiimote.buttons["A"]:
                  self.gestureRunning = True
-                 self.printIrData(self.wiimoteNode.wiimote.ir)
+                 self.saveIrData(self.wiimoteNode.wiimote.ir)
             if self.wiimoteNode.wiimote.buttons["A"] == False and self.gestureRunning == True:
                 self.gestureRunning = False
                 print(self.x)
                 print(self.y)
                 print("gestureEnd")
-
-
-            '''if self.wiimoteNode.wiimote.buttons["A"]:
-
-                if self.gestureRunning == False:
-                    self.wiimoteNode.wiimote.leds[1] = True
-                    self.wiimoteNode.wiimote.rumble(0.1)
-                    self.gestureRunning = True
-                    self.printIrData(self.wiimoteNode.wiimote.ir)
-                    print("gestureStart")
-                    #print((wm.accelerometer))
-            elif self.wiimoteNode.wiimote.buttons["A"] == False:
-                if self.gestureRunning == True:
-                    self.gestureRunning = False
-                    print("gestureEnd")
-                    print(self.x)
-                    print(self.y)
-                    '''
 
 
             time.sleep(0.05)
@@ -80,7 +62,7 @@ class Analyze():
 
         self.wiimoteNode.wiimote.ir.register_callback(self.print_ir)
 
-    def printIrData(self, ir_data):
+    def saveIrData(self, ir_data):
         #print("GESTURERUNNING")
         if len(ir_data) == 0:
             return
