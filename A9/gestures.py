@@ -47,11 +47,11 @@ class Analyze():
             while self.wiimoteNode.wiimote.buttons["A"]:
                  self.gestureRunning = True
                  self.printIrData(self.wiimoteNode.wiimote.ir)
-            if self.wiimoteNode.wiimote.buttons["A"] == False:
+            if self.wiimoteNode.wiimote.buttons["A"] == False and self.gestureRunning == True:
                 self.gestureRunning = False
-                print("gestureEnd")
                 print(self.x)
                 print(self.y)
+                print("gestureEnd")
 
 
             '''if self.wiimoteNode.wiimote.buttons["A"]:
@@ -81,16 +81,14 @@ class Analyze():
         self.wiimoteNode.wiimote.ir.register_callback(self.print_ir)
 
     def printIrData(self, ir_data):
-        while self.gestureRunning:
-
-            print("GESTURERUNNING")
-            if len(ir_data) == 0:
-                return
-            for ir_obj in ir_data:
-                #print("%4d %4d %2d     " % (ir_obj["x"],ir_obj["y"],ir_obj["size"]), end=' ')
-                print("%4d %4d %2d     " % (ir_obj["x"],ir_obj["y"],ir_obj["size"]))
-                self.x.append(ir_obj["x"])
-                self.y.append(ir_obj["y"])
+        #print("GESTURERUNNING")
+        if len(ir_data) == 0:
+            return
+        for ir_obj in ir_data:
+            #print("%4d %4d %2d     " % (ir_obj["x"],ir_obj["y"],ir_obj["size"]), end=' ')
+            print("%4d %4d %2d     " % (ir_obj["x"],ir_obj["y"],ir_obj["size"]))
+            self.x.append(ir_obj["x"])
+            self.y.append(ir_obj["y"])
 
     # create plotwidgets
     def createWidgets(self):
