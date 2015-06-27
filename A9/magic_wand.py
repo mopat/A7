@@ -66,13 +66,20 @@ class Analyze():
         bufferNodeX = self.fc.createNode('Buffer', pos=(150, 0))
         bufferNodeY = self.fc.createNode('Buffer', pos=(300, 0))
 
-        # connect buffers to the plots
+        self.plotCurve = self.fc.createNode('PlotCurve', pos=(300, 0))
         self.fc.connectTerminals(self.wiimoteNode['irX'], bufferNodeX['dataIn'])
         self.fc.connectTerminals(self.wiimoteNode['irY'], bufferNodeY['dataIn'])
 
+        # connect buffers to the plots
+        #self.fc.connectTerminals(self.wiimoteNode['irX'], bufferNodeX['dataIn'])
+        #self.fc.connectTerminals(self.wiimoteNode['irY'], bufferNodeY['dataIn'])
+
         # display buffer data in the plots
-        self.fc.connectTerminals(bufferNodeX['dataOut'], self.pw1Node['In'])
-        self.fc.connectTerminals(bufferNodeY['dataOut'], self.pw2Node['In'])
+        self.fc.connectTerminals(bufferNodeX['dataOut'], self.plotCurve['x'])
+        self.fc.connectTerminals(bufferNodeY['dataOut'], self.plotCurve['y'])
+
+        self.fc.connectTerminals(self.plotCurve['plot'], self.pw1Node['In'])
+
 
 
 if __name__ == '__main__':

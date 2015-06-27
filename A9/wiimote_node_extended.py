@@ -79,9 +79,11 @@ class WiimoteNode(Node):
         
         label2 = QtGui.QLabel("Update rate (Hz)")
         self.layout.addWidget(label2)
-        self.irX = 0
-        self.irY = 0
-        self.irS = 0
+        self._ir_vals = []
+        self.irX = 1
+        self.irY = 1
+        self.irS = 1
+        self.gradient = 1
 
         self.update_rate_input = QtGui.QSpinBox()
         self.update_rate_input.setMinimum(0)
@@ -157,13 +159,13 @@ class WiimoteNode(Node):
         if(len(self._ir_vals) != 0):
             for ir_obj in self._ir_vals:
                 #print("%4d %4d %2d     " % (ir_obj["x"],ir_obj["y"],ir_obj["size"]), end=' ')
-                print("%4d %4d %2d     " % (ir_obj["x"],ir_obj["y"],ir_obj["size"]))
+                #print("%4d %4d %2d     " % (ir_obj["x"],ir_obj["y"],ir_obj["size"]))
                 self.irX = ir_obj["x"]
                 self.irY = ir_obj["y"]
                 self.irS = ir_obj["size"]
+                self.gradient = self.irY/self.irX
 
         x,y,z = self._acc_vals
-
 
         return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z]), 'irX': self.irX, 'irY': self.irY, 'irS': self.irS}
 
