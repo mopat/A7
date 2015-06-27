@@ -61,6 +61,7 @@ class WiimoteNode(Node):
             'accelZ': dict(io='out'),
             'irX': dict(io='out'),
             'irY': dict(io='out'),
+            'irS': dict(io='out'),
         }
         self.wiimote = None
         self._acc_vals = []
@@ -79,6 +80,9 @@ class WiimoteNode(Node):
         
         label2 = QtGui.QLabel("Update rate (Hz)")
         self.layout.addWidget(label2)
+        self.irX = 0
+        self.irY = 0
+        self.irS = 0
 
         self.update_rate_input = QtGui.QSpinBox()
         self.update_rate_input.setMinimum(0)
@@ -152,10 +156,18 @@ class WiimoteNode(Node):
 
     def process(self, **kwdargs):
         if(len(self._ir_vals) != 0):
-            print(self._ir_vals)
+            for ir_obj in self._ir_vals:
+                #print("%4d %4d %2d     " % (ir_obj["x"],ir_obj["y"],ir_obj["size"]), end=' ')
+                print("%4d %4d %2d     " % (ir_obj["x"],ir_obj["y"],ir_obj["size"]))
+                self.irX = ir_obj["x"]
+                self.irY = ir_obj["y"]
+                self.irS = ir_obj["size"]
+
         x,y,z = self._acc_vals
-        return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z])}
-        
+
+
+        return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z]), 'irX': self.irX, 'irY': self.irY, 'irS': self.irS}
+
 fclib.registerNodeType(WiimoteNode, [('Sensor',)])
     
 if __name__ == '__main__':
@@ -185,7 +197,7 @@ if __name__ == '__main__':
     wiimoteNode = fc.createNode('Wiimote', pos=(0, 0), )
     bufferNode = fc.createNode('Buffer', pos=(150, 0))
 
-    fc.connectTerminals(wiimoteNode['accelX'], bufferNode['dataIn'])
+    fc.connectTerminals(wiimoteNode['irX'], bufferNode['dataIn'])
     fc.connectTerminals(bufferNode['dataOut'], pw1Node['In'])
 
     win.show()
