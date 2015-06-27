@@ -2,6 +2,8 @@
 
 import time
 import sys
+import svmutil
+
 
 from wiimote_node_extended import *
 
