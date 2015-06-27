@@ -8,7 +8,6 @@ import pyqtgraph.flowchart.library as fclib
 from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
 import numpy as np
-import time
 import wiimote
 
 
