@@ -8,7 +8,7 @@ import pyqtgraph.flowchart.library as fclib
 from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
 import numpy as np
-
+import time
 import wiimote
 
 
@@ -59,6 +59,8 @@ class WiimoteNode(Node):
             'accelX': dict(io='out'),  
             'accelY': dict(io='out'), 
             'accelZ': dict(io='out'),
+            'irX': dict(io='out'),
+            'irY': dict(io='out'),
         }
         self.wiimote = None
         self._acc_vals = []
@@ -71,7 +73,7 @@ class WiimoteNode(Node):
         self.layout.addWidget(label)
         
         self.text = QtGui.QLineEdit()
-        self.btaddr = "b8:ae:6e:18:5d:ab" # set some example
+        self.btaddr = "B8:AE:6E:1B:AD:A0" # set some example
         self.text.setText(self.btaddr)
         self.layout.addWidget(self.text)
         
@@ -94,7 +96,10 @@ class WiimoteNode(Node):
         self.update_timer = QtCore.QTimer()
         self.update_timer.timeout.connect(self.update_all_sensors)
 
+
+
         # super()
+
         Node.__init__(self, name, terminals=terminals)
         
 
@@ -102,15 +107,22 @@ class WiimoteNode(Node):
         if self.wiimote == None:
             return
         self._acc_vals = self.wiimote.accelerometer
-        # todo: other sensors...
+        self._ir_vals = self.wiimote.ir
         self.update()
 
     def update_accel(self, acc_vals):
         self._acc_vals = acc_vals
         self.update()
 
+    def update_ir(self, ir_vals):
+        if len(ir_vals) == 0:
+            return
+        self._ir_vals = ir_vals
+        self.update()
+
     def ctrlWidget(self):
         return self.ui
+
         
     def connect_wiimote(self):
         self.btaddr = str(self.text.text()).strip()
@@ -132,11 +144,15 @@ class WiimoteNode(Node):
         if rate == 0: # use callbacks for max. update rate
             self.update_timer.stop()
             self.wiimote.accelerometer.register_callback(self.update_accel)
+            self.wiimote.ir.register_callback(self.update_ir)
         else:
             self.wiimote.accelerometer.unregister_callback(self.update_accel)
+            self.wiimote.ir.unregister_callback(self.update_ir)
             self.update_timer.start(1000.0/rate)
 
     def process(self, **kwdargs):
+        if(len(self._ir_vals) != 0):
+            print(self._ir_vals)
         x,y,z = self._acc_vals
         return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z])}
         
