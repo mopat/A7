@@ -46,6 +46,7 @@ class Analyze():
         self.layout.addWidget(self.pw1, 0, 1)
         self.pw1.setYRange(0, 1024)
         self.pw1Node = self.fc.createNode('PlotWidget', pos=(150, -150))
+        self.pw1.setBackground('w')
         self.pw1Node.setPlot(self.pw1)
 
         self.pw2 = pg.PlotWidget()
@@ -69,12 +70,9 @@ class Analyze():
         bufferNodeY = self.fc.createNode('Buffer', pos=(300, 0))
 
         self.plotCurve = self.fc.createNode('PlotCurve', pos=(300, 0))
+
         self.fc.connectTerminals(self.wiimoteNode['irX'], bufferNodeX['dataIn'])
         self.fc.connectTerminals(self.wiimoteNode['irY'], bufferNodeY['dataIn'])
-
-        # connect buffers to the plots
-        #self.fc.connectTerminals(self.wiimoteNode['irX'], bufferNodeX['dataIn'])
-        #self.fc.connectTerminals(self.wiimoteNode['irY'], bufferNodeY['dataIn'])
 
         # display buffer data in the plots
         self.fc.connectTerminals(bufferNodeX['dataOut'], self.plotCurve['x'])
