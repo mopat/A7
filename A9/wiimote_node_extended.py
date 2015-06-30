@@ -197,10 +197,11 @@ class WiimoteNode(Node):
             m = PyMouse()
         if(self.wiimote.buttons["B"] and self.irX != 0):
             screenSize = m.screen_size()
-            maxX = int((screenSize[0] / 1024) * self.irY)
-            maxY = int((screenSize[1] / 1024) * self.irX)
-            print(maxX)
-            m.move(maxY, maxX)
+            xScreen = screenSize[0] - int((screenSize[0] / 1024) * self.irX)
+            yScreen = int((screenSize[1] / 780) * self.irY)
+
+            if xScreen <= screenSize[0] and xScreen >= 0 and yScreen <= screenSize[1] and yScreen >= 0:
+                m.move(xScreen, yScreen)
 
         if(self.isAPressed):
             print("gestureRunning")
