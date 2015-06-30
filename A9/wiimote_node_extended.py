@@ -190,7 +190,9 @@ class WiimoteNode(Node):
             self.isAPressed = False
             self.isAReleased = True
             print("Rleadse")
-
+        elif self.wiimote.buttons["A"] == False:
+            self.isAPressed = False
+            self.isAReleased = False
 
 
         if(self.isAPressed):
