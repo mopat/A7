@@ -188,13 +188,11 @@ class WiimoteNode(Node):
             self.isAPressed = False
 
         if(self.isAPressed):
-
             print("gestureRunning")
         else:
             self.irX = 0
             self.irY = 0
             self.irS = 0
-            print("gestureNotRunning")
 
         x,y,z = self._acc_vals
 
