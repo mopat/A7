@@ -166,12 +166,19 @@ class WiimoteNode(Node):
                 self.irX = ir_obj["x"]
                 self.irY = ir_obj["y"]
                 self.irS = ir_obj["size"]
-
-        if self.wiimote.buttons["A"]:
+        if self.wiimote.buttons["A"] and self.isAPressed == False:
+            self.isAPressed = True
+            self.irXVals = []
+            self.irYVals = []
+            self.irSVals = []
+        if self.wiimote.buttons["A"] and self.isAPressed:
             self.isAPressed = True
             self.irXVals.append(self.irX)
             self.irYVals.append(self.irY)
             self.irSVals.append(self.irS)
+            print(self.irXVals)
+            print(self.irYVals)
+            print(self.irSVals)
         else:
             self.isAPressed = False
 
