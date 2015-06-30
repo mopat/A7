@@ -61,6 +61,7 @@ class WiimoteNode(Node):
             'irX': dict(io='out'),
             'irY': dict(io='out'),
             'irS': dict(io='out'),
+            'a': dict(io='out'),
         }
         self.wiimote = None
         self._acc_vals = []
@@ -193,7 +194,7 @@ class WiimoteNode(Node):
 
         x,y,z = self._acc_vals
 
-        return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z]), 'irX': self.irX, 'irY': self.irY, 'irS': self.irS}
+        return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z]), 'irX': self.irX, 'irY': self.irY, 'irS': self.irS, 'a': self.isAPressed}
 
 fclib.registerNodeType(WiimoteNode, [('Sensor',)])
     
