@@ -29,6 +29,11 @@ class RecognizerNode(Node):
         self.last_name = None
         self.last_accuracy = 0.0
 
+        self.paintWidget = QtGui.QWidget()
+        self.paintWidget.setGeometry(800, 600, 800, 600)
+        self.paintWidget.setWindowTitle('Paint Widget')
+        self.paintWidget.show()
+
         Node.__init__(self, name, terminals=terminals)
 
     def process(self, **kwds):
@@ -48,13 +53,16 @@ class RecognizerNode(Node):
                 else:
                     self.last_name = '(Not enough points - try again!)'
                     self.last_accuracy = 0.0
-                    #print (len(points))
-                    #print (self.last_name)
+                    print (self.last_name)
 
     def printGesture(self):
-        print("test")
         print(self.last_name)
         print(self.last_accuracy)
+
+        qp = QtGui.QPainter()
+        qp.begin(self)
+        qp.setPen(QPen(Qt.black))
+        self.paintWidget.drawCircle(qp)
 
 fclib.registerNodeType(RecognizerNode, [('Data',)])
 
@@ -109,6 +117,9 @@ class Analyze():
         self.pw2.setYRange(0, 1024)
         self.pw2Node = self.fc.createNode('PlotWidget', pos=(300, -150))
         self.pw2Node.setPlot(self.pw2)
+
+
+        #l = pg.GraphicsLayout(border=(100,100,100))
 
     # create node for wiimote
     def wiimoteNode(self):
