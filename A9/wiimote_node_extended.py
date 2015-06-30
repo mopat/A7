@@ -63,6 +63,7 @@ class WiimoteNode(Node):
             'irS': dict(io='out'),
             'irXirYTup': dict(io='out'),
             'a': dict(io='out'),
+            'aRel': dict(io='out'),
         }
         self.wiimote = None
         self._acc_vals = []
@@ -82,7 +83,7 @@ class WiimoteNode(Node):
         label2 = QtGui.QLabel("Update rate (Hz)")
         self.layout.addWidget(label2)
         self._ir_vals = []
-
+        self.isAReleased = False
         self.irXVals = []
         self.irYVals = []
         self.irSVals = []
@@ -170,12 +171,14 @@ class WiimoteNode(Node):
                 self.irY = ir_obj["y"]
                 self.irS = ir_obj["size"]
         if self.wiimote.buttons["A"] and self.isAPressed == False:
+            self.isAReleased = False
             self.isAPressed = True
             self.irXVals = []
             self.irYVals = []
             self.irSVals = []
             self.irXirYTup = []
         if self.wiimote.buttons["A"] and self.isAPressed:
+            self.isAReleased = False
             self.isAPressed = True
             self.irXVals.append(self.irX)
             self.irYVals.append(self.irY)
@@ -183,9 +186,12 @@ class WiimoteNode(Node):
             tup = (self.irX, self.irY)
             self.irXirYTup.append(tup)
             #print(self.irXirYTup)
-
-        else:
+        elif self.wiimote.buttons["A"] == False and self.isAPressed:
             self.isAPressed = False
+            self.isAReleased = True
+            print("Rleadse")
+
+
 
         if(self.isAPressed):
             print("gestureRunning")
@@ -196,7 +202,7 @@ class WiimoteNode(Node):
 
         x,y,z = self._acc_vals
 
-        return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z]), 'irX': self.irX, 'irY': self.irY, 'irS': self.irS, 'irXirYTup': self.irXirYTup, 'a': self.isAPressed}
+        return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z]), 'irX': self.irX, 'irY': self.irY, 'irS': self.irS, 'irXirYTup': self.irXirYTup, 'a': self.isAPressed, 'aRel': self.isAReleased}
 
 fclib.registerNodeType(WiimoteNode, [('Sensor',)])
     
