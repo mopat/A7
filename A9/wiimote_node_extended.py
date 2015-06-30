@@ -174,6 +174,7 @@ class WiimoteNode(Node):
             self.irXVals = []
             self.irYVals = []
             self.irSVals = []
+            self.irXirYTup = []
         if self.wiimote.buttons["A"] and self.isAPressed:
             self.isAPressed = True
             self.irXVals.append(self.irX)
