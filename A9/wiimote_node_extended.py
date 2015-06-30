@@ -64,6 +64,7 @@ class WiimoteNode(Node):
             'irS': dict(io='out'),
             'irXirYTup': dict(io='out'),
             'a': dict(io='out'),
+            'b': dict(io='out'),
             'aRel': dict(io='out'),
         }
         self.wiimote = None
@@ -109,6 +110,7 @@ class WiimoteNode(Node):
         self.update_timer = QtCore.QTimer()
         self.update_timer.timeout.connect(self.update_all_sensors)
         self.isAPressed = False
+        self.isBPressed = False
 
 
         # super()
@@ -194,25 +196,33 @@ class WiimoteNode(Node):
         elif self.wiimote.buttons["A"] == False:
             self.isAPressed = False
             self.isAReleased = False
-            m = PyMouse()
+
+        if self.wiimote.buttons["B"] == False:
+            self.isBPressed = False
+        elif self.wiimote.buttons["B"]:
+            self.isBPressed = True
+
+        '''m = PyMouse()
         if(self.wiimote.buttons["B"] and self.irX != 0):
+            self.isBPressed = True
             screenSize = m.screen_size()
             xScreen = screenSize[0] - int((screenSize[0] / 1024) * self.irX)
-            yScreen = int((screenSize[1] / 780) * self.irY)
+            yScreen = int((screenSize[1] / 760) * self.irY)
 
             if xScreen <= screenSize[0] and xScreen >= 0 and yScreen <= screenSize[1] and yScreen >= 0:
-                m.move(xScreen, yScreen)
+                m.move(xScreen, yScreen)'''
 
-        if(self.isAPressed):
-            print("gestureRunning")
+        if(self.isAPressed or self.isBPressed):
+            print("buttonpressed")
         else:
             self.irX = 0
             self.irY = 0
             self.irS = 0
 
         x,y,z = self._acc_vals
+        print(self.irY)
 
-        return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z]), 'irX': self.irX, 'irY': self.irY, 'irS': self.irS, 'irXirYTup': self.irXirYTup, 'a': self.isAPressed, 'aRel': self.isAReleased}
+        return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z]), 'irX': self.irX, 'irY': self.irY, 'irS': self.irS, 'irXirYTup': self.irXirYTup, 'a': self.isAPressed, 'aRel': self.isAReleased, 'b': self.isBPressed}
 
 fclib.registerNodeType(WiimoteNode, [('Sensor',)])
     

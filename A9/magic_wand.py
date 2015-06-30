@@ -66,6 +66,38 @@ class RecognizerNode(Node):
 
 fclib.registerNodeType(RecognizerNode, [('Data',)])
 
+class PointerNode(Node):
+    nodeName = "Pointer"
+
+    def __init__(self, name):
+        terminals = {
+            'irXIn': dict(io='in'),
+            'irYIn': dict(io='in'),
+            'bPressed': dict(io='in'),
+        }
+
+        self.mouse = PyMouse()
+        self.screenSize = self.mouse.screen_size()
+
+        Node.__init__(self, name, terminals=terminals)
+
+    def process(self, **kwds):
+        self.irX = kwds['irXIn']
+        self.irY = kwds['irYIn']
+        self.isBPressed = kwds['bPressed']
+
+        if self.isBPressed  and self.irX != 0:
+
+            xScreen = self.screenSize[0] - int((self.screenSize[0] / 1024) * self.irX)
+            yScreen = int((self.screenSize[1] / 760) * self.irY)
+
+            if xScreen <= self.screenSize[0] and xScreen >= 0 and yScreen <= self.screenSize[1] and yScreen >= 0:
+                self.mouse.move(xScreen, yScreen)
+
+
+fclib.registerNodeType(PointerNode, [('Data',)])
+
+
 class Analyze():
     def __init__(self):
         self.name = "Wiimote"
@@ -97,6 +129,7 @@ class Analyze():
         self.bufferPlots()
 
         self.recognizerNode()
+        self.pointerNode()
 
         self.win.show()
 
@@ -156,5 +189,12 @@ class Analyze():
         self.fc.connectTerminals(self.wiimoteNode['aRel'], self.recognizer['buttonPressed'])
 
 
+
+    def pointerNode(self):
+        self.pointerNode = self.fc.createNode('Pointer', pos=(400, 0))
+
+        self.fc.connectTerminals(self.wiimoteNode['irX'], self.pointerNode['irXIn'])
+        self.fc.connectTerminals(self.wiimoteNode['irY'], self.pointerNode['irYIn'])
+        self.fc.connectTerminals(self.wiimoteNode['b'], self.pointerNode['bPressed'])
 if __name__ == '__main__':
     an = Analyze()
