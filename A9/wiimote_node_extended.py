@@ -61,6 +61,7 @@ class WiimoteNode(Node):
             'irX': dict(io='out'),
             'irY': dict(io='out'),
             'irS': dict(io='out'),
+            'irXirYTup': dict(io='out'),
             'a': dict(io='out'),
         }
         self.wiimote = None
@@ -85,6 +86,7 @@ class WiimoteNode(Node):
         self.irXVals = []
         self.irYVals = []
         self.irSVals = []
+        self.irXirYTup = []
         self.irX = 1
         self.irY = 1
         self.irS = 1
@@ -177,9 +179,10 @@ class WiimoteNode(Node):
             self.irXVals.append(self.irX)
             self.irYVals.append(self.irY)
             self.irSVals.append(self.irS)
-            print(self.irXVals)
-            print(self.irYVals)
-            print(self.irSVals)
+            tup = (self.irX, self.irY)
+            self.irXirYTup.append(tup)
+            print(self.irXirYTup)
+
         else:
             self.isAPressed = False
 
@@ -194,7 +197,7 @@ class WiimoteNode(Node):
 
         x,y,z = self._acc_vals
 
-        return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z]), 'irX': self.irX, 'irY': self.irY, 'irS': self.irS, 'a': self.isAPressed}
+        return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z]), 'irX': self.irX, 'irY': self.irY, 'irS': self.irS, 'irXirYTup': self.irXirYTup, 'a': self.isAPressed}
 
 fclib.registerNodeType(WiimoteNode, [('Sensor',)])
     
