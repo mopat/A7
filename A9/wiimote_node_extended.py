@@ -80,10 +80,13 @@ class WiimoteNode(Node):
         label2 = QtGui.QLabel("Update rate (Hz)")
         self.layout.addWidget(label2)
         self._ir_vals = []
+
+        self.irXVals = []
+        self.irYVals = []
+        self.irSVals = []
         self.irX = 1
         self.irY = 1
         self.irS = 1
-        self.gradient = 1
 
         self.update_rate_input = QtGui.QSpinBox()
         self.update_rate_input.setMinimum(0)
@@ -100,7 +103,7 @@ class WiimoteNode(Node):
         # update timer
         self.update_timer = QtCore.QTimer()
         self.update_timer.timeout.connect(self.update_all_sensors)
-
+        self.isAPressed = False
 
 
         # super()
@@ -163,6 +166,23 @@ class WiimoteNode(Node):
                 self.irX = ir_obj["x"]
                 self.irY = ir_obj["y"]
                 self.irS = ir_obj["size"]
+
+        if self.wiimote.buttons["A"]:
+            self.isAPressed = True
+            self.irXVals.append(self.irX)
+            self.irYVals.append(self.irY)
+            self.irSVals.append(self.irS)
+        else:
+            self.isAPressed = False
+
+        if(self.isAPressed):
+
+            print("gestureRunning")
+        else:
+            self.irX = 0
+            self.irY = 0
+            self.irS = 0
+            print("gestureNotRunning")
 
         x,y,z = self._acc_vals
 

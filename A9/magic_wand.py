@@ -37,6 +37,7 @@ class Analyze():
         self.bufferPlots()
 
         self.win.show()
+
         if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
             QtGui.QApplication.instance().exec_()
 
@@ -78,7 +79,9 @@ class Analyze():
         self.fc.connectTerminals(bufferNodeX['dataOut'], self.plotCurve['x'])
         self.fc.connectTerminals(bufferNodeY['dataOut'], self.plotCurve['y'])
 
+
         self.fc.connectTerminals(self.plotCurve['plot'], self.pw1Node['In'])
+
 
 
 
