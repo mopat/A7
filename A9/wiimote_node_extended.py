@@ -9,6 +9,7 @@ from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
 import numpy as np
 import wiimote
+from pymouse import PyMouse
 
 
 class BufferNode(CtrlNode):
@@ -160,7 +161,7 @@ class WiimoteNode(Node):
         else:
             self.wiimote.accelerometer.unregister_callback(self.update_accel)
             self.wiimote.ir.unregister_callback(self.update_ir)
-            self.update_timer.start(1000.0/rate)
+            self.update_timer.start(50.0/rate)
 
     def process(self, **kwdargs):
         if(len(self._ir_vals) != 0):
@@ -189,11 +190,17 @@ class WiimoteNode(Node):
         elif self.wiimote.buttons["A"] == False and self.isAPressed:
             self.isAPressed = False
             self.isAReleased = True
-            print("Rleadse")
+            print("Release")
         elif self.wiimote.buttons["A"] == False:
             self.isAPressed = False
             self.isAReleased = False
-
+            m = PyMouse()
+        if(self.wiimote.buttons["B"] and self.irX != 0):
+            screenSize = m.screen_size()
+            maxX = int((screenSize[0] / 1024) * self.irY)
+            maxY = int((screenSize[1] / 1024) * self.irX)
+            print(maxX)
+            m.move(maxY, maxX)
 
         if(self.isAPressed):
             print("gestureRunning")
