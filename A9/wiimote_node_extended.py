@@ -182,7 +182,7 @@ class WiimoteNode(Node):
             self.irSVals.append(self.irS)
             tup = (self.irX, self.irY)
             self.irXirYTup.append(tup)
-            print(self.irXirYTup)
+            #print(self.irXirYTup)
 
         else:
             self.isAPressed = False

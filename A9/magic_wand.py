@@ -13,23 +13,49 @@ circlePoints = [(269, 84), (263, 86), (257, 92), (253, 98), (249, 104), (245, 11
 class RecognizerNode(Node):
     nodeName = "Recognizer"
 
-    #self.recognizer = Recognizer()
-    #self.recognizer.addTemplate('circle', circlePoints)
-
     def __init__(self, name):
         terminals = {
-            'IrX': dict(io='in'),
-            'IrY': dict(io='in'),
+            #'IrX': dict(io='in'),
+            #'IrY': dict(io='in'),
+            'tupelIn': dict(io='in'),
             'buttonPressed': dict(io='in')
         }
+
+        self.recognizer = Recognizer()
+        self.recognizer.addTemplate('circle', circlePoints)
+        self.positions = []
+
+        self.last_name = None
+        self.last_accuracy = 0.0
 
         Node.__init__(self, name, terminals=terminals)
 
     def process(self, **kwds):
         if kwds['buttonPressed']:
-            print (kwds['IrX'])
-            print (kwds['IrY'])
+                #x = kwds['IrX']
+                #y = kwds['IrY']
+                tupel = kwds['tupelIn']
+                self.positions = tupel
 
+                print (self.positions)
+
+                points = [(p[0], p[1]) for p in self.positions]
+                if len(points) > 10:
+                    (name, score) = self.recognizer.recognize(points)
+                    self.last_name = name
+                    self.last_accuracy = score
+
+                    self.printGesture()
+                else:
+                    self.last_name = '(Not enough points - try again!)'
+                    self.last_accuracy = 0.0
+                    #print (len(points))
+                    #print (self.last_name)
+
+    def printGesture(self):
+        print("test")
+        print(self.last_name)
+        print(self.last_accuracy)
 
 fclib.registerNodeType(RecognizerNode, [('Data',)])
 
@@ -113,8 +139,9 @@ class Analyze():
     def recognizerNode(self):
         self.recognizer = self.fc.createNode('Recognizer', pos=(400, 0))
 
-        self.fc.connectTerminals(self.bufferNodeX['dataOut'], self.recognizer['IrX'])
-        self.fc.connectTerminals(self.bufferNodeY['dataOut'], self.recognizer['IrY'])
+        #self.fc.connectTerminals(self.bufferNodeX['dataOut'], self.recognizer['IrX'])
+        #self.fc.connectTerminals(self.bufferNodeY['dataOut'], self.recognizer['IrY'])
+        self.fc.connectTerminals(self.wiimoteNode['irXirYTup'], self.recognizer['tupelIn'])
         self.fc.connectTerminals(self.wiimoteNode['a'], self.recognizer['buttonPressed'])
 
 
