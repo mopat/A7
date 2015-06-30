@@ -163,7 +163,6 @@ class WiimoteNode(Node):
                 self.irX = ir_obj["x"]
                 self.irY = ir_obj["y"]
                 self.irS = ir_obj["size"]
-                self.gradient = self.irY/self.irX
 
         x,y,z = self._acc_vals
 
