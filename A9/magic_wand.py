@@ -19,8 +19,8 @@ class RecognizerNode(Node):
 
     def __init__(self, name):
         terminals = {
-            #'IrX': dict(io='in'),
-            #'IrY': dict(io='in'),
+            'IrX': dict(io='in'),
+            'IrY': dict(io='in'),
             'tupelIn': dict(io='in'),
             'onePressed': dict(io='in')
         }
@@ -50,8 +50,6 @@ class RecognizerNode(Node):
 
     def process(self, **kwds):
         if kwds['onePressed']:
-                #x = kwds['IrX']
-                #y = kwds['IrY']
                 tupel = kwds['tupelIn']
                 self.positions = tupel
 
@@ -92,6 +90,7 @@ class PointerNode(Node):
             'irYIn': dict(io='in'),
             'bPressed': dict(io='in'),
             'aPressed': dict(io='in'),
+            'bRel': dict(io='in'),
         }
 
         self.mouse = PyMouse()
@@ -105,19 +104,27 @@ class PointerNode(Node):
         self.irY = kwds['irYIn']
         self.isBPressed = kwds['bPressed']
         self.isAPressed = kwds['aPressed']
+        self.isBReleased = kwds['bRel']
 
         if self.isBPressed and self.irX != 0 and self.irY != 0:
-
             xScreen = self.screenSize[0] - int((self.screenSize[0] / 1024) * self.irX)
             yScreen = int((self.screenSize[1] / 760) * self.irY)
 
             if xScreen <= self.screenSize[0] and xScreen >= 0 and yScreen <= self.screenSize[1] and yScreen >= 0:
                 self.mouse.move(xScreen, yScreen)
 
+        # when b is released and object is dragged, object is released
+        if self.isBReleased and self.dragging == True:
+            self.mouse.click(self.mouse.position()[0], self.mouse.position()[1])
+            self.dragging = False
+        # when b is not pressed and a is pressed, do a single click
         if self.isAPressed and self.isBPressed == False:
             self.mouse.click(self.mouse.position()[0], self.mouse.position()[1])
+            self.dragging = False
+        # when b and a are pressed, do drag
         elif self.isAPressed and self.isBPressed:
             self.mouse.press(self.mouse.position()[0], self.mouse.position()[1])
+            self.dragging = True
 
 
 fclib.registerNodeType(PointerNode, [('Data',)])
@@ -250,6 +257,7 @@ class Analyze():
         self.fc.connectTerminals(self.wiimoteNode['irX'], self.pointerNode['irXIn'])
         self.fc.connectTerminals(self.wiimoteNode['irY'], self.pointerNode['irYIn'])
         self.fc.connectTerminals(self.wiimoteNode['b'], self.pointerNode['bPressed'])
+        self.fc.connectTerminals(self.wiimoteNode['bRel'], self.pointerNode['bRel'])
         self.fc.connectTerminals(self.wiimoteNode['a'], self.pointerNode['aPressed'])
 if __name__ == '__main__':
     an = Analyze()

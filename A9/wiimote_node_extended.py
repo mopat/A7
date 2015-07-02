@@ -64,8 +64,9 @@ class WiimoteNode(Node):
             'irS': dict(io='out'),
             'irXirYTup': dict(io='out'),
             'one': dict(io='out'),
-            'b': dict(io='out'),
             'oneRel': dict(io='out'),
+            'b': dict(io='out'),
+            'bRel': dict(io='out'),
             'a': dict(io='out'),
         }
         self.wiimote = None
@@ -111,8 +112,11 @@ class WiimoteNode(Node):
         self.update_timer = QtCore.QTimer()
         self.update_timer.timeout.connect(self.update_all_sensors)
         self.isOnePressed = False
+        self.isOneReleased = False
         self.isBPressed = False
+        self.isBReleased = False
         self.isAPressed = False
+
 
 
 
@@ -168,7 +172,7 @@ class WiimoteNode(Node):
             self.wiimote.ir.unregister_callback(self.update_ir)
             self.update_timer.start(50.0/rate)
 
-    def process(self, **kwdargs):
+    def set_irX_irY(self):
         if(len(self._ir_vals) != 0):
             for ir_obj in self._ir_vals:
                 #print("%4d %4d %2d     " % (ir_obj["x"],ir_obj["y"],ir_obj["size"]), end=' ')
@@ -176,6 +180,7 @@ class WiimoteNode(Node):
                 self.irX = ir_obj["x"]
                 self.irY = ir_obj["y"]
                 self.irS = ir_obj["size"]
+        # empty arrays and set boolean flags when 'One' is pressed
         if self.wiimote.buttons["One"] and self.isOnePressed == False:
             self.isOneReleased = False
             self.isOnePressed = True
@@ -183,6 +188,7 @@ class WiimoteNode(Node):
             self.irYVals = []
             self.irSVals = []
             self.irXirYTup = []
+        # set boolean flags and append values to arrays
         if self.wiimote.buttons["One"] and self.isOnePressed:
             self.isOneReleased = False
             self.isOnePressed = True
@@ -191,46 +197,55 @@ class WiimoteNode(Node):
             self.irSVals.append(self.irS)
             tup = (self.irX, self.irY)
             self.irXirYTup.append(tup)
-            #print(self.irXirYTup)
+        # logic to check if one button is releasd
         elif self.wiimote.buttons["One"] == False and self.isOnePressed:
             self.isOnePressed = False
             self.isOneReleased = True
-            print("Release")
+        # when one button is not pressed set the boolen flags false
         elif self.wiimote.buttons["One"] == False:
             self.isOnePressed = False
             self.isOneReleased = False
 
+    # set state of b button
+    def set_B_button(self):
+        # logic to check if b is released
+        if self.isBPressed and self.wiimote.buttons["B"] == False:
+            self.isBReleased = True
+        else:
+            self.isBReleased = False
+
+        # logic to check if b is pressed
         if self.wiimote.buttons["B"] == False:
             self.isBPressed = False
         elif self.wiimote.buttons["B"]:
             self.isBPressed = True
 
+    # set state of a button
+    def set_A_button(self):
         if self.wiimote.buttons["A"]:
             self.isAPressed = True
         else:
             self.isAPressed = False
 
-        '''m = PyMouse()
-        if(self.wiimote.buttons["B"] and self.irX != 0):
-            self.isBPressed = True
-            screenSize = m.screen_size()
-            xScreen = screenSize[0] - int((screenSize[0] / 1024) * self.irX)
-            yScreen = int((screenSize[1] / 760) * self.irY)
-
-            if xScreen <= screenSize[0] and xScreen >= 0 and yScreen <= screenSize[1] and yScreen >= 0:
-                m.move(xScreen, yScreen)'''
-
-        if(self.isOnePressed or self.isBPressed):
-            print("buttonpressed")
-        else:
+    # when no buttons are pressed, the ir values are 0
+    # so it's possible to get values only when a button is pressed
+    def check_button_pressed(self):
+         if(self.isOnePressed == False and self.isBPressed == False and self.isOnePressed == False):
             self.irX = 0
             self.irY = 0
             self.irS = 0
 
+
+    def process(self, **kwdargs):
+        self.set_irX_irY()
+        self.set_B_button()
+        self.set_A_button()
+        self.check_button_pressed()
+
         x,y,z = self._acc_vals
 
 
-        return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z]), 'irX': self.irX, 'irY': self.irY, 'irS': self.irS, 'irXirYTup': self.irXirYTup, 'one': self.isOnePressed, 'oneRel': self.isOneReleased, 'b': self.isBPressed,  'a': self.isAPressed}
+        return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z]), 'irX': self.irX, 'irY': self.irY, 'irS': self.irS, 'irXirYTup': self.irXirYTup, 'one': self.isOnePressed, 'oneRel': self.isOneReleased, 'b': self.isBPressed, 'bRel': self.isBReleased,  'a': self.isAPressed}
 
 fclib.registerNodeType(WiimoteNode, [('Sensor',)])
     
