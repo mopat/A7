@@ -237,15 +237,23 @@ class MagicWand():
         self.pw1 = pg.PlotWidget()
         self.layout.addWidget(self.pw1, 0, 1)
         self.pw1.setYRange(0, 1024)
-        self.pw1Node = self.fc.createNode('PlotWidget', pos=(150, -150))
         self.pw1.setBackground('w')
+        self.pw1Node = self.fc.createNode('PlotWidget', pos=(150, -150))
         self.pw1Node.setPlot(self.pw1)
 
         self.pw2 = pg.PlotWidget()
         self.layout.addWidget(self.pw2, 0, 2)
         self.pw2.setYRange(0, 1024)
         self.pw2Node = self.fc.createNode('PlotWidget', pos=(300, -150))
+        self.pw2.setBackground('w')
         self.pw2Node.setPlot(self.pw2)
+
+        self.pw3 = pg.PlotWidget()
+        self.layout.addWidget(self.pw3, 0, 3)
+        self.pw3.setYRange(0, 1024)
+        self.pw3Node = self.fc.createNode('PlotWidget', pos=(450, -150))
+        self.pw3Node.setPlot(self.pw3)
+        self.pw3.setBackground('w')
 
     # create node for wiimote
     def wiimoteNode(self):
@@ -266,21 +274,21 @@ class MagicWand():
         self.fc.connectTerminals(self.wiimoteNode['irX'], self.bufferNodeX['dataIn'])
         self.fc.connectTerminals(self.wiimoteNode['irY'], self.bufferNodeY['dataIn'])
 
-        # display buffer data in the plots
+        # display buffer x y data as plotcourve
         self.fc.connectTerminals(self.bufferNodeX['dataOut'], self.plotCurve['x'])
         self.fc.connectTerminals(self.bufferNodeY['dataOut'], self.plotCurve['y'])
 
+        # display buffer x y data as curves
+        self.fc.connectTerminals(self.bufferNodeX['dataOut'], self.pw2Node['In'])
+        self.fc.connectTerminals(self.bufferNodeY['dataOut'], self.pw3Node['In'])
 
         self.fc.connectTerminals(self.plotCurve['plot'], self.pw1Node['In'])
 
     def recognizerNode(self):
         self.recognizer = self.fc.createNode('Recognizer', pos=(400, 0))
 
-        #self.fc.connectTerminals(self.bufferNodeX['dataOut'], self.recognizer['IrX'])
-        #self.fc.connectTerminals(self.bufferNodeY['dataOut'], self.recognizer['IrY'])
         self.fc.connectTerminals(self.wiimoteNode['irXirYTup'], self.recognizer['tupelIn'])
         self.fc.connectTerminals(self.wiimoteNode['oneRel'], self.recognizer['onePressed'])
-
 
 
     def pointerNode(self):

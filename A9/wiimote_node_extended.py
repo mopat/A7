@@ -192,11 +192,14 @@ class WiimoteNode(Node):
         if self.wiimote.buttons["One"] and self.isOnePressed:
             self.isOneReleased = False
             self.isOnePressed = True
-            self.irXVals.append(self.irX)
-            self.irYVals.append(self.irY)
-            self.irSVals.append(self.irS)
-            tup = (self.irX, self.irY)
-            self.irXirYTup.append(tup)
+            # check if ir data is not zero and append values
+            if self.irX != 0 or self.irY != 0:
+                self.irXVals.append(self.irX)
+                self.irYVals.append(self.irY)
+                self.irSVals.append(self.irS)
+                tup = (self.irX, self.irY)
+                self.irXirYTup.append(tup)
+            print(self.irXirYTup)
         # logic to check if one button is releasd
         elif self.wiimote.buttons["One"] == False and self.isOnePressed:
             self.isOnePressed = False
