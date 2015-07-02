@@ -8,8 +8,11 @@ import svmutil
 from wiimote_node_extended import *
 from pymouse import PyMouse
 from dollar import Recognizer
+from pyqtgraph.GraphicsScene import GraphicsScene
 
 circlePoints = [(269, 84), (263, 86), (257, 92), (253, 98), (249, 104), (245, 114), (243, 122), (239, 132), (237, 142), (235, 152), (235, 162), (235, 172), (235, 180), (239, 190), (245, 198), (251, 206), (259, 212), (267, 216), (275, 218), (281, 222), (287, 224), (295, 224), (301, 226), (311, 226), (319, 226), (329, 226), (339, 226), (349, 226), (352, 226), (360, 226), (362, 225), (366, 219), (367, 217), (367, 209), (367, 206), (367, 198), (367, 190), (367, 182), (367, 174), (365, 166), (363, 158), (359, 152), (355, 146), (353, 138), (349, 134), (345, 130), (341, 124), (340, 122), (338, 121), (337, 119), (336, 117), (334, 116), (332, 115), (331, 114), (327, 110), (325, 109), (323, 109), (321, 108), (320, 108), (318, 107), (316, 107), (315, 107), (314, 107), (313, 107), (312, 107), (311, 107), (310, 107), (309, 106), (308, 106), (307, 105), (306, 105), (305, 105), (304, 105), (303, 104), (302, 104), (301, 104), (300, 104), (299, 103), (298, 103), (296, 102), (295, 101), (293, 101), (292, 100), (291, 100), (290, 100), (289, 100), (288, 100), (288, 99), (287, 99), (287, 99)]
+
+
 
 class RecognizerNode(Node):
     nodeName = "Recognizer"
@@ -29,10 +32,19 @@ class RecognizerNode(Node):
         self.last_name = None
         self.last_accuracy = 0.0
 
-        self.paintWidget = QtGui.QWidget()
-        self.paintWidget.setGeometry(800, 600, 800, 600)
-        self.paintWidget.setWindowTitle('Paint Widget')
-        self.paintWidget.show()
+        self.win2 = pg.GraphicsView()
+        #self.win2.setGeometry(300, 300, 350, 100)
+        self.vb = pg.ViewBox()
+        self.win2.setCentralItem(self.vb)
+
+        self.win2.show()
+
+        #self.paintWidget = QtGui.QWidget()
+        #self.paintWidget.setGeometry(800, 600, 800, 600)
+        #self.paintWidget.setWindowTitle('Paint Widget')
+        #self.paintWidget.show()
+
+
 
         Node.__init__(self, name, terminals=terminals)
 
@@ -59,10 +71,15 @@ class RecognizerNode(Node):
         print(self.last_name)
         print(self.last_accuracy)
 
-        qp = QtGui.QPainter()
-        qp.begin(self)
-        qp.setPen(QPen(Qt.black))
-        self.paintWidget.drawCircle(qp)
+        self.paintEvent()
+
+    def paintEvent(self):
+        print("painting")
+
+        obj = Obj()
+        self.vb.addItem(obj)
+
+
 
 fclib.registerNodeType(RecognizerNode, [('Data',)])
 
@@ -115,6 +132,30 @@ class PointerNode(Node):
 
 fclib.registerNodeType(PointerNode, [('Data',)])
 
+class Obj(QtGui.QGraphicsObject):
+    def __init__(self):
+        QtGui.QGraphicsObject.__init__(self)
+        GraphicsScene.registerObject(self)
+
+    def paint(self, p, *args):
+        #p.setPen(pg.mkPen(200,200,200))
+        p.setBrush(QtGui.QColor(200, 0, 0))
+        #p.setBackground(QtCore.Qt.red)
+        p.drawEllipse(self.boundingRect())
+
+    def boundingRect(self):
+        newRect = QtCore.QRectF(10, 15, 50, 40)
+
+        return newRect
+
+
+
+    def mouseClickEvent(self, ev):
+        if ev.double():
+            print("double click")
+        else:
+            print("click")
+        ev.accept()
 
 class Analyze():
     def __init__(self):
@@ -129,6 +170,11 @@ class Analyze():
         self.win.setCentralWidget(self.cw)
         self.layout = QtGui.QGridLayout()
         self.cw.setLayout(self.layout)
+
+
+
+        #obj2 = Obj()
+        #win.addItem(obj2)
 
         #create flowchart with data in and out properties
         self.fc = Flowchart(terminals={
