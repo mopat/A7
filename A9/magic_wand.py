@@ -186,7 +186,7 @@ class Analyze():
         #self.fc.connectTerminals(self.bufferNodeX['dataOut'], self.recognizer['IrX'])
         #self.fc.connectTerminals(self.bufferNodeY['dataOut'], self.recognizer['IrY'])
         self.fc.connectTerminals(self.wiimoteNode['irXirYTup'], self.recognizer['tupelIn'])
-        self.fc.connectTerminals(self.wiimoteNode['aRel'], self.recognizer['buttonPressed'])
+        self.fc.connectTerminals(self.wiimoteNode['oneRel'], self.recognizer['buttonPressed'])
 
 
 
