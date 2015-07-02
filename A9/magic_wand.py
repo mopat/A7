@@ -19,7 +19,7 @@ class RecognizerNode(Node):
             #'IrX': dict(io='in'),
             #'IrY': dict(io='in'),
             'tupelIn': dict(io='in'),
-            'buttonPressed': dict(io='in')
+            'onePressed': dict(io='in')
         }
 
         self.recognizer = Recognizer()
@@ -37,7 +37,7 @@ class RecognizerNode(Node):
         Node.__init__(self, name, terminals=terminals)
 
     def process(self, **kwds):
-        if kwds['buttonPressed']:
+        if kwds['onePressed']:
                 #x = kwds['IrX']
                 #y = kwds['IrY']
                 tupel = kwds['tupelIn']
@@ -74,6 +74,7 @@ class PointerNode(Node):
             'irXIn': dict(io='in'),
             'irYIn': dict(io='in'),
             'bPressed': dict(io='in'),
+            'aPressed': dict(io='in'),
         }
 
         self.mouse = PyMouse()
@@ -85,6 +86,7 @@ class PointerNode(Node):
         self.irX = kwds['irXIn']
         self.irY = kwds['irYIn']
         self.isBPressed = kwds['bPressed']
+        self.isAPressed = kwds['aPressed']
 
         if self.isBPressed  and self.irX != 0:
 
@@ -93,6 +95,10 @@ class PointerNode(Node):
 
             if xScreen <= self.screenSize[0] and xScreen >= 0 and yScreen <= self.screenSize[1] and yScreen >= 0:
                 self.mouse.move(xScreen, yScreen)
+        if self.isAPressed:
+            xMousePos = self.mouse.position()[0]
+            yMousePos = self.mouse.position()[1]
+            self.mouse.click(xMousePos, yMousePos)
 
 
 fclib.registerNodeType(PointerNode, [('Data',)])
@@ -186,7 +192,7 @@ class Analyze():
         #self.fc.connectTerminals(self.bufferNodeX['dataOut'], self.recognizer['IrX'])
         #self.fc.connectTerminals(self.bufferNodeY['dataOut'], self.recognizer['IrY'])
         self.fc.connectTerminals(self.wiimoteNode['irXirYTup'], self.recognizer['tupelIn'])
-        self.fc.connectTerminals(self.wiimoteNode['oneRel'], self.recognizer['buttonPressed'])
+        self.fc.connectTerminals(self.wiimoteNode['oneRel'], self.recognizer['onePressed'])
 
 
 
@@ -196,5 +202,6 @@ class Analyze():
         self.fc.connectTerminals(self.wiimoteNode['irX'], self.pointerNode['irXIn'])
         self.fc.connectTerminals(self.wiimoteNode['irY'], self.pointerNode['irYIn'])
         self.fc.connectTerminals(self.wiimoteNode['b'], self.pointerNode['bPressed'])
+        self.fc.connectTerminals(self.wiimoteNode['a'], self.pointerNode['aPressed'])
 if __name__ == '__main__':
     an = Analyze()
