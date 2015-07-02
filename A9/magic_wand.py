@@ -145,8 +145,6 @@ class Obj(QtGui.QGraphicsObject):
 
         return newRect
 
-
-
     def mouseClickEvent(self, ev):
         if ev.double():
             print("double click")
@@ -154,7 +152,7 @@ class Obj(QtGui.QGraphicsObject):
             print("click")
         ev.accept()
 
-class Analyze():
+class MagicWand():
     def __init__(self):
         self.name = "Wiimote"
         if len(sys.argv) > 1:
@@ -212,9 +210,6 @@ class Analyze():
         self.pw2Node = self.fc.createNode('PlotWidget', pos=(300, -150))
         self.pw2Node.setPlot(self.pw2)
 
-
-        #l = pg.GraphicsLayout(border=(100,100,100))
-
     # create node for wiimote
     def wiimoteNode(self):
         self.wiimoteNode = self.fc.createNode('Wiimote', pos=(0, 0), )
@@ -260,4 +255,4 @@ class Analyze():
         self.fc.connectTerminals(self.wiimoteNode['bRel'], self.pointerNode['bRel'])
         self.fc.connectTerminals(self.wiimoteNode['a'], self.pointerNode['aPressed'])
 if __name__ == '__main__':
-    an = Analyze()
+    mw = MagicWand()
