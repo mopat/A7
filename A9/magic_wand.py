@@ -39,7 +39,7 @@ class RecognizerNode(Node):
 
         self.win2.setBackgroundBrush(QtGui.QColor(255, 255, 255))
         self.win2.setWindowTitle('Paint Widget')
-        self.win2.setGeometry(800, 600, 800, 600)
+        self.win2.setGeometry(1200, 1000, 1200, 1000)
 
         self.vb = pg.ViewBox()
 
@@ -79,23 +79,21 @@ class RecognizerNode(Node):
         self.count = self.count + 1
 
     def paintCircle(self):
-        print("painting circle")
 
-        circle = Circle()
-
-
-        ellipse = QtGui.QGraphicsEllipseItem(QtCore.QRectF(0, 0, 320, 5))
+        ellipse = QtGui.QGraphicsEllipseItem(QtCore.QRectF(0, 0, 120, 120))
         ellipse.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
         ellipse.setBrush(QtGui.QColor(200, 0, 0))
         ellipse.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, False)
-        ellipse.setPen(QtGui.QPen(QtCore.Qt.red, 1.3))
+
 
         self.vb.addItem(ellipse)
 
     def paintRect(self):
-        print("painting rect")
+        rect = QtGui.QGraphicsRectItem(QtCore.QRectF(0, 0, 120, 120))
+        rect.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
+        rect.setBrush(QtGui.QColor(100, 0, 0))
+        rect.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, False)
 
-        rect = Rect()
         self.vb.addItem(rect)
 
 fclib.registerNodeType(RecognizerNode, [('Data',)])
@@ -120,12 +118,13 @@ class Circle(QtGui.QGraphicsObject):
         QtGui.QGraphicsView.addItem(ellipse)
 
     def boundingRect(self):
-        self.newCircle = QtCore.QRectF(10, 15, 50, 40)
+        newCircle = QtCore.QRectF(10, 15, 50, 40)
 
-        return self.newCircle
+        return newCircle
 
     def hoverLeaveEvent(self, ev):
         ev.ignore()
+
     def mousePressEvent(self, ev):
         if ev.button() == QtCore.Qt.LeftButton:
             ev.accept()
@@ -150,9 +149,9 @@ class Rect(QtGui.QGraphicsObject):
         p.drawRect(10, 15, 50, 50)
 
     def boundingRect(self):
-        self.newRect = QtCore.QRectF(10, 15, 50, 40)
+        newRect = QtCore.QRectF(10, 15, 50, 40)
 
-        return self.newRect
+        return newRect
 
     def hoverLeaveEvent(self, ev):
         ev.ignore()
@@ -163,6 +162,7 @@ class Rect(QtGui.QGraphicsObject):
             self.pressDelta = self.mapToParent(ev.pos()) - self.pos()
         else:
             ev.ignore()
+
     def mouseMoveEvent(self, ev):
         self.setPos(self.mapToParent(ev.pos()) - self.pressDelta)
 
@@ -223,7 +223,7 @@ class MagicWand():
         app = QtGui.QApplication([])
         # create layout
         self.win = QtGui.QMainWindow()
-        self.win.setWindowTitle('Wiimote Analayzer')
+        self.win.setWindowTitle('Wiimote MagicWand')
         self.cw = QtGui.QWidget()
         self.win.setCentralWidget(self.cw)
         self.layout = QtGui.QGridLayout()
