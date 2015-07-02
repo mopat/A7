@@ -119,15 +119,7 @@ class PointerNode(Node):
             yMousePos = self.mouse.position()[1]
             self.mouse.click(xMousePos, yMousePos)
         elif self.isAPressed and self.isBPressed:
-            xMousePos = self.mouse.position()[0]
-            yMousePos = self.mouse.position()[1]
-            self.dragging = True
-            self.mouse.press(xMousePos, yMousePos)
-
-        elif self.dragging and self.isAPressed:
-            xMousePos = self.mouse.position()[0]
-            yMousePos = self.mouse.position()[1]
-            self.mouse.click(xMousePos, yMousePos)
+            self.mouse.press(self.mouse.position()[0], self.mouse.position()[1])
 
 
 fclib.registerNodeType(PointerNode, [('Data',)])
