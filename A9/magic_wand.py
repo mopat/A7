@@ -115,9 +115,7 @@ class PointerNode(Node):
                 self.mouse.move(xScreen, yScreen)
 
         if self.isAPressed and self.isBPressed == False:
-            xMousePos = self.mouse.position()[0]
-            yMousePos = self.mouse.position()[1]
-            self.mouse.click(xMousePos, yMousePos)
+            self.mouse.click(self.mouse.position()[0], self.mouse.position()[1])
         elif self.isAPressed and self.isBPressed:
             self.mouse.press(self.mouse.position()[0], self.mouse.position()[1])
 
