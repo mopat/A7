@@ -80,7 +80,7 @@ class RecognizerNode(Node):
 
     def paintCircle(self):
 
-        ellipse = QtGui.QGraphicsEllipseItem(QtCore.QRectF(0, 0, 120, 120))
+        ellipse = QtGui.QGraphicsEllipseItem(QtCore.QRectF(100, 100, 120, 120))
         ellipse.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
         ellipse.setBrush(QtGui.QColor(200, 0, 0))
         ellipse.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, False)
@@ -89,7 +89,7 @@ class RecognizerNode(Node):
         self.vb.addItem(ellipse)
 
     def paintRect(self):
-        rect = QtGui.QGraphicsRectItem(QtCore.QRectF(0, 0, 120, 120))
+        rect = QtGui.QGraphicsRectItem(QtCore.QRectF(300, 300, 120, 120))
         rect.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
         rect.setBrush(QtGui.QColor(100, 0, 0))
         rect.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, False)
