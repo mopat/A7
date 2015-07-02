@@ -79,6 +79,7 @@ class PointerNode(Node):
 
         self.mouse = PyMouse()
         self.screenSize = self.mouse.screen_size()
+        self.dragging = False
 
         Node.__init__(self, name, terminals=terminals)
 
@@ -88,14 +89,25 @@ class PointerNode(Node):
         self.isBPressed = kwds['bPressed']
         self.isAPressed = kwds['aPressed']
 
-        if self.isBPressed  and self.irX != 0:
+        if self.isBPressed and self.irX != 0 and self.irY != 0:
 
             xScreen = self.screenSize[0] - int((self.screenSize[0] / 1024) * self.irX)
             yScreen = int((self.screenSize[1] / 760) * self.irY)
 
             if xScreen <= self.screenSize[0] and xScreen >= 0 and yScreen <= self.screenSize[1] and yScreen >= 0:
                 self.mouse.move(xScreen, yScreen)
-        if self.isAPressed:
+
+        if self.isAPressed and self.isBPressed == False:
+            xMousePos = self.mouse.position()[0]
+            yMousePos = self.mouse.position()[1]
+            self.mouse.click(xMousePos, yMousePos)
+        elif self.isAPressed and self.isBPressed:
+            xMousePos = self.mouse.position()[0]
+            yMousePos = self.mouse.position()[1]
+            self.dragging = True
+            self.mouse.press(xMousePos, yMousePos)
+
+        elif self.dragging and self.isAPressed:
             xMousePos = self.mouse.position()[0]
             yMousePos = self.mouse.position()[1]
             self.mouse.click(xMousePos, yMousePos)
