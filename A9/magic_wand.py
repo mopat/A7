@@ -42,12 +42,12 @@ class RecognizerNode(Node):
         self.win2.setGeometry(800, 600, 800, 600)
 
         self.vb = pg.ViewBox()
+        self.vb.setAspectLocked()
 
         self.win2.setCentralItem(self.vb)
 
         self.win2.show()
-
-
+        self.count = 0
 
 
         Node.__init__(self, name, terminals=terminals)
@@ -73,10 +73,11 @@ class RecognizerNode(Node):
         print(self.last_name)
         print(self.last_accuracy)
 
-        if self.last_name == "circle":
+        if self.count % 2 == 0:
             self.paintCircle()
-        elif self.last_name == "square":
+        else:
             self.paintRect()
+        self.count = self.count + 1
 
     def paintCircle(self):
         print("painting circle")
@@ -90,8 +91,69 @@ class RecognizerNode(Node):
         rect = Rect()
         self.vb.addItem(rect)
 
-
 fclib.registerNodeType(RecognizerNode, [('Data',)])
+
+
+class Circle(QtGui.QGraphicsObject):
+    def __init__(self):
+        QtGui.QGraphicsObject.__init__(self)
+        GraphicsScene.registerObject(self)
+        self.setAcceptHoverEvents(True)
+        self.setAcceptDrops(True)
+
+    def paint(self, p, *args):
+        #p.setPen(pg.mkPen(200,200,200))
+        p.setBrush(QtGui.QColor(200, 0, 0))
+
+        p.drawEllipse(0, 0, 25, 25)
+
+    def boundingRect(self):
+        self.newCircle = QtCore.QRectF(10, 15, 50, 40)
+
+        return self.newCircle
+
+    def hoverLeaveEvent(self, ev):
+        ev.ignore()
+    def mousePressEvent(self, ev):
+        if ev.button() == QtCore.Qt.LeftButton:
+            ev.accept()
+            self.pressDelta = self.mapToParent(ev.pos()) - self.pos()
+        else:
+            ev.ignore()
+    def mouseMoveEvent(self, ev):
+        self.setPos(self.mapToParent(ev.pos()) - self.pressDelta)
+
+class Rect(QtGui.QGraphicsObject):
+    def __init__(self):
+        QtGui.QGraphicsObject.__init__(self)
+        GraphicsScene.registerObject(self)
+        self.setAcceptHoverEvents(True)
+        self.setAcceptDrops(True)
+
+
+    def paint(self, p, *args):
+        #p.setPen(pg.mkPen(200,200,200))
+        p.setBrush(QtGui.QColor(100, 0, 0))
+        #p.setBackground(QtCore.Qt.red)
+        p.drawRect(10, 15, 10, 10)
+
+    def boundingRect(self):
+        self.newRect = QtCore.QRectF(10, 15, 50, 40)
+
+        return self.newRect
+
+    def hoverLeaveEvent(self, ev):
+        ev.ignore()
+
+    def mousePressEvent(self, ev):
+        if ev.button() == QtCore.Qt.LeftButton:
+            ev.accept()
+            self.pressDelta = self.mapToParent(ev.pos()) - self.pos()
+        else:
+            ev.ignore()
+    def mouseMoveEvent(self, ev):
+        self.setPos(self.mapToParent(ev.pos()) - self.pressDelta)
+
 
 class PointerNode(Node):
     nodeName = "Pointer"
@@ -140,54 +202,6 @@ class PointerNode(Node):
 
 
 fclib.registerNodeType(PointerNode, [('Data',)])
-
-class Circle(QtGui.QGraphicsObject):
-    def __init__(self):
-        QtGui.QGraphicsObject.__init__(self)
-        GraphicsScene.registerObject(self)
-
-    def paint(self, p, *args):
-        #p.setPen(pg.mkPen(200,200,200))
-        p.setBrush(QtGui.QColor(200, 0, 0))
-
-        p.drawEllipse(0, 0, 25, 25)
-
-    def boundingRect(self):
-        newRect = QtCore.QRectF(10, 15, 50, 40)
-
-        return newRect
-
-
-
-    def mouseClickEvent(self, ev):
-        if ev.double():
-            print("double click")
-        else:
-            print("click")
-        ev.accept()
-
-class Rect(QtGui.QGraphicsObject):
-    def __init__(self):
-        QtGui.QGraphicsObject.__init__(self)
-        GraphicsScene.registerObject(self)
-
-    def paint(self, p, *args):
-        #p.setPen(pg.mkPen(200,200,200))
-        p.setBrush(QtGui.QColor(100, 0, 0))
-        #p.setBackground(QtCore.Qt.red)
-        p.drawRect(10, 15, 10, 10)
-
-    def boundingRect(self):
-        newRect = QtCore.QRectF(10, 15, 50, 40)
-
-        return newRect
-
-    def mouseClickEvent(self, ev):
-        if ev.double():
-            print("double click")
-        else:
-            print("click")
-        ev.accept()
 
 class MagicWand():
     def __init__(self):
