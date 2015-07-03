@@ -20,8 +20,8 @@ class RecognizerNode(Node):
 
     def __init__(self, name):
         terminals = {
-            'IrX': dict(io='in'),
-            'IrY': dict(io='in'),
+            'irX': dict(io='in'),
+            'irY': dict(io='in'),
             'tupelIn': dict(io='in'),
             'onePressed': dict(io='in')
         }
@@ -44,43 +44,56 @@ class RecognizerNode(Node):
         self.vb = pg.ViewBox()
 
         self.win2.setCentralItem(self.vb)
-
+        self.oneRel = False
         self.win2.show()
         self.count = 0
+
+        # count to prevent multiple execution when one button is released, because for each terminal input code is executed -> now every 4th step it will be executed
+        self.exCount = 0
 
 
         Node.__init__(self, name, terminals=terminals)
 
     def process(self, **kwds):
-        if kwds['onePressed']:
+        self.oneRel = kwds['onePressed']
+        if(self.oneRel and self.exCount == 4):
+            self.exCount = 0
+        if self.oneRel:
                 tupel = kwds['tupelIn']
                 self.positions = tupel
 
-                points = [(p[0], p[1]) for p in self.positions]
-                if len(points) > 10:
-                    (name, score) = self.recognizer.recognize(points)
-                    self.last_name = name
-                    self.last_accuracy = score
+                if self.exCount == 0:
 
-                    self.printGesture()
-                else:
-                    self.last_name = '(Not enough points - try again!)'
-                    self.last_accuracy = 0.0
-                    print (self.last_name)
+                    points = [(p[0], p[1]) for p in self.positions]
+                    if len(points) > 10:
+                        (name, score) = self.recognizer.recognize(points)
+                        self.last_name = name
+                        self.last_accuracy = score
+
+                        self.printGesture()
+                    else:
+                        self.last_name = '(Not enough points - try again!)'
+                        self.last_accuracy = 0.0
+                        print (self.last_name)
+                self.exCount += 1
+
 
     def printGesture(self):
         print(self.last_name)
         print(self.last_accuracy)
-
+        print(self.count)
         if self.count % 2 == 0:
             self.paintCircle()
         else:
             self.paintRect()
-        self.count = self.count + 1
+        self.count += 1
+
 
     def paintCircle(self):
+        xPos = random.randint(0, 1200)
+        yPos = random.randint(0, 1000)
 
-        ellipse = QtGui.QGraphicsEllipseItem(QtCore.QRectF(100, 100, 120, 120))
+        ellipse = QtGui.QGraphicsEllipseItem(QtCore.QRectF(xPos, yPos, 50, 50))
         ellipse.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
         ellipse.setBrush(QtGui.QColor(200, 0, 0))
         ellipse.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, False)
@@ -89,7 +102,9 @@ class RecognizerNode(Node):
         self.vb.addItem(ellipse)
 
     def paintRect(self):
-        rect = QtGui.QGraphicsRectItem(QtCore.QRectF(300, 300, 120, 120))
+        xPos = random.randint(0, 1200)
+        yPos = random.randint(0, 1000)
+        rect = QtGui.QGraphicsRectItem(QtCore.QRectF(xPos, yPos, 50, 50))
         rect.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
         rect.setBrush(QtGui.QColor(100, 0, 0))
         rect.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, False)
@@ -313,6 +328,8 @@ class MagicWand():
     def recognizerNode(self):
         self.recognizer = self.fc.createNode('Recognizer', pos=(400, 0))
 
+        self.fc.connectTerminals(self.wiimoteNode['irX'], self.recognizer['irX'])
+        self.fc.connectTerminals(self.wiimoteNode['irY'], self.recognizer['irY'])
         self.fc.connectTerminals(self.wiimoteNode['irXirYTup'], self.recognizer['tupelIn'])
         self.fc.connectTerminals(self.wiimoteNode['oneRel'], self.recognizer['onePressed'])
 
