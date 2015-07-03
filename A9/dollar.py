@@ -56,10 +56,10 @@ class Recognizer:
       """Determine which gesture template most closely matches the gesture represented by the input points. 'points' is a list of tuples, eg: [(1, 10), (3, 8) ...]. Returns a tuple of the form (name, score) where name is the matching template, and score is a float [0..1] representing the match certainty."""
 
       points = [Point(point[0], point[1]) for point in points]
-      points = _resample(points, numPoints);
-      points = _rotateToZero(points);
-      points = _scaleToSquare(points, squareSize);
-      points = _translateToOrigin(points);
+      points = _resample(points, numPoints)
+      points = _rotateToZero(points)
+      points = _scaleToSquare(points, squareSize)
+      points = _translateToOrigin(points)
 
       bestDistance = float("infinity")
       bestTemplate = None

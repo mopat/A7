@@ -48,22 +48,24 @@ class RecognizerNode(Node):
         self.win2.show()
         self.count = 0
 
-        # count to prevent multiple execution when one button is released, because for each terminal input code is executed -> now every 4th step it will be executed
+        # counter to prevent multiple execution when one button is released, because for each terminal input code is executed -> now every 4th step it will be executed
         self.exCount = 0
 
 
         Node.__init__(self, name, terminals=terminals)
 
+
     def process(self, **kwds):
         self.oneRel = kwds['onePressed']
+
         if(self.oneRel and self.exCount == 4):
             self.exCount = 0
         if self.oneRel:
                 tupel = kwds['tupelIn']
-                self.positions = tupel
+
 
                 if self.exCount == 0:
-
+                    self.positions = self.resample(tupel)
                     points = [(p[0], p[1]) for p in self.positions]
                     if len(points) > 10:
                         (name, score) = self.recognizer.recognize(points)
@@ -81,106 +83,75 @@ class RecognizerNode(Node):
     def printGesture(self):
         print(self.last_name)
         print(self.last_accuracy)
-        print(self.count)
-        if self.count % 2 == 0:
-            self.paintCircle()
-        else:
-            self.paintRect()
-        self.count += 1
+
+        if self.last_accuracy > 0.5:
+            if self.last_name == 'circle':
+                self.paintCircle()
+            elif self.last_name == 'square':
+                self.paintRect()
 
 
     def paintCircle(self):
+        # random pos
         xPos = random.randint(0, 1200)
         yPos = random.randint(0, 1000)
-
         ellipse = QtGui.QGraphicsEllipseItem(QtCore.QRectF(xPos, yPos, 50, 50))
-        ellipse.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
-        ellipse.setBrush(QtGui.QColor(200, 0, 0))
-        ellipse.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, False)
 
+        ellipse.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
+
+        # random colors
+        rc = self.randomColor()
+        ellipse.setBrush(QtGui.QColor(rc[0], rc[1], rc[2]))
 
         self.vb.addItem(ellipse)
 
     def paintRect(self):
+        # random pos
         xPos = random.randint(0, 1200)
         yPos = random.randint(0, 1000)
         rect = QtGui.QGraphicsRectItem(QtCore.QRectF(xPos, yPos, 50, 50))
+
         rect.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
-        rect.setBrush(QtGui.QColor(100, 0, 0))
-        rect.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, False)
+        # random colors
+        rc = self.randomColor()
+        rect.setBrush(QtGui.QColor(rc[0], rc[1], rc[2]))
 
         self.vb.addItem(rect)
 
+    def resample(self, point_list,step_count=64):
+        newpoints = []
+        length = len(point_list)
+        stepsize = length/step_count
+        curpos = 0
+        newpoints.append(point_list[0])
+        i = 1
+        while i < len(point_list):
+
+            p1 = point_list[i-1]
+
+            d = self.distance(p1,point_list[i])
+
+            if curpos+d >= stepsize:
+                nx = p1[0] + ((stepsize-curpos)/d)*(point_list[i][0]-p1[0])
+                ny = p1[1] + ((stepsize-curpos)/d)*(point_list[i][1]-p1[1])
+                newpoints.append([nx,ny])
+                point_list.insert(i,[nx,ny])
+                curpos = 0
+            else:
+                curpos += d
+            i += 1
+        return newpoints
+
+    def distance(self, p1, p2):
+        d = p2[0] - p1[0]
+        if(d < 0):
+            d *= -1
+
+        return d
+
+    def randomColor(self):
+        return [random.randint(0,255), random.randint(0,255), random.randint(0,255)]
 fclib.registerNodeType(RecognizerNode, [('Data',)])
-
-
-class Circle(QtGui.QGraphicsObject):
-    def __init__(self):
-        QtGui.QGraphicsObject.__init__(self)
-        GraphicsScene.registerObject(self)
-        self.setAcceptHoverEvents(True)
-        self.setAcceptDrops(True)
-
-    def paint(self, p, *args):
-        #p.setPen(pg.mkPen(200,200,200))
-        p.setBrush(QtGui.QColor(200, 0, 0))
-
-        ellipse = QtGui.QGraphicsEllipseItem(QtCore.QRectF(0, 0, 320, 5))
-        ellipse.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
-        ellipse.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
-        ellipse.setPen(QtGui.QPen(QtCore.Qt.red, 2))
-        #p.drawEllipse(ellipse)
-        QtGui.QGraphicsView.addItem(ellipse)
-
-    def boundingRect(self):
-        newCircle = QtCore.QRectF(10, 15, 50, 40)
-
-        return newCircle
-
-    def hoverLeaveEvent(self, ev):
-        ev.ignore()
-
-    def mousePressEvent(self, ev):
-        if ev.button() == QtCore.Qt.LeftButton:
-            ev.accept()
-            self.pressDelta = self.mapToParent(ev.pos()) - self.pos()
-        else:
-            ev.ignore()
-    def mouseMoveEvent(self, ev):
-        self.setPos(self.mapToParent(ev.pos()) - self.pressDelta)
-
-class Rect(QtGui.QGraphicsObject):
-    def __init__(self):
-        QtGui.QGraphicsObject.__init__(self)
-        GraphicsScene.registerObject(self)
-        self.setAcceptHoverEvents(True)
-        self.setAcceptDrops(True)
-
-
-    def paint(self, p, *args):
-        #p.setPen(pg.mkPen(200,200,200))
-        p.setBrush(QtGui.QColor(100, 0, 0))
-        #p.setBackground(QtCore.Qt.red)
-        p.drawRect(10, 15, 50, 50)
-
-    def boundingRect(self):
-        newRect = QtCore.QRectF(10, 15, 50, 40)
-
-        return newRect
-
-    def hoverLeaveEvent(self, ev):
-        ev.ignore()
-
-    def mousePressEvent(self, ev):
-        if ev.button() == QtCore.Qt.LeftButton:
-            ev.accept()
-            self.pressDelta = self.mapToParent(ev.pos()) - self.pos()
-        else:
-            ev.ignore()
-
-    def mouseMoveEvent(self, ev):
-        self.setPos(self.mapToParent(ev.pos()) - self.pressDelta)
-
 
 class PointerNode(Node):
     nodeName = "Pointer"
@@ -244,16 +215,12 @@ class MagicWand():
         self.layout = QtGui.QGridLayout()
         self.cw.setLayout(self.layout)
 
-
-
-        #obj2 = Obj()
-        #win.addItem(obj2)
-
         #create flowchart with data in and out properties
         self.fc = Flowchart(terminals={
             'dataIn': {'io': 'in'},
             'dataOut': {'io': 'out'}
         })
+
         self.w = self.fc.widget()
 
         # add flowchart to layout
@@ -279,20 +246,20 @@ class MagicWand():
         self.layout.addWidget(self.pw1, 0, 1)
         self.pw1.setYRange(0, 1024)
         self.pw1.setBackground('w')
-        self.pw1Node = self.fc.createNode('PlotWidget', pos=(150, -150))
+        self.pw1Node = self.fc.createNode('PlotWidget', pos=(450, 150))
         self.pw1Node.setPlot(self.pw1)
 
         self.pw2 = pg.PlotWidget()
         self.layout.addWidget(self.pw2, 0, 2)
         self.pw2.setYRange(0, 1024)
-        self.pw2Node = self.fc.createNode('PlotWidget', pos=(300, -150))
+        self.pw2Node = self.fc.createNode('PlotWidget', pos=(300, 0))
         self.pw2.setBackground('w')
         self.pw2Node.setPlot(self.pw2)
 
         self.pw3 = pg.PlotWidget()
         self.layout.addWidget(self.pw3, 0, 3)
         self.pw3.setYRange(0, 1024)
-        self.pw3Node = self.fc.createNode('PlotWidget', pos=(450, -150))
+        self.pw3Node = self.fc.createNode('PlotWidget', pos=(300, 300))
         self.pw3Node.setPlot(self.pw3)
         self.pw3.setBackground('w')
 
@@ -307,10 +274,10 @@ class MagicWand():
     # plot the buffers for the accelerometer data
     def bufferPlots(self):
         # buffers for x, y and z-Axis
-        self.bufferNodeX = self.fc.createNode('Buffer', pos=(150, 0))
-        self.bufferNodeY = self.fc.createNode('Buffer', pos=(300, 0))
+        self.bufferNodeX = self.fc.createNode('Buffer', pos=(150, 150))
+        self.bufferNodeY = self.fc.createNode('Buffer', pos=(150, 300))
 
-        self.plotCurve = self.fc.createNode('PlotCurve', pos=(300, 0))
+        self.plotCurve = self.fc.createNode('PlotCurve', pos=(300, 150))
 
         self.fc.connectTerminals(self.wiimoteNode['irX'], self.bufferNodeX['dataIn'])
         self.fc.connectTerminals(self.wiimoteNode['irY'], self.bufferNodeY['dataIn'])
@@ -326,7 +293,7 @@ class MagicWand():
         self.fc.connectTerminals(self.plotCurve['plot'], self.pw1Node['In'])
 
     def recognizerNode(self):
-        self.recognizer = self.fc.createNode('Recognizer', pos=(400, 0))
+        self.recognizer = self.fc.createNode('Recognizer', pos=(150, -150))
 
         self.fc.connectTerminals(self.wiimoteNode['irX'], self.recognizer['irX'])
         self.fc.connectTerminals(self.wiimoteNode['irY'], self.recognizer['irY'])
@@ -335,7 +302,7 @@ class MagicWand():
 
 
     def pointerNode(self):
-        self.pointerNode = self.fc.createNode('Pointer', pos=(400, 0))
+        self.pointerNode = self.fc.createNode('Pointer', pos=(150, 0))
 
         self.fc.connectTerminals(self.wiimoteNode['irX'], self.pointerNode['irXIn'])
         self.fc.connectTerminals(self.wiimoteNode['irY'], self.pointerNode['irYIn'])
