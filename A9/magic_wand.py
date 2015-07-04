@@ -53,9 +53,7 @@ class RecognizerNode(Node):
         # counter to prevent multiple execution when one button is released, because for each terminal input code is executed -> now every 4th step it will be executed
         self.exCount = 0
 
-
         Node.__init__(self, name, terminals=terminals)
-
 
     def process(self, **kwds):
         self.oneRel = kwds['onePressed']
@@ -65,7 +63,7 @@ class RecognizerNode(Node):
         if self.oneRel:
                 tupel = kwds['tupelIn']
 
-
+                # porcess is executed every time an data comes in, so there's a counter which executes every 4th time
                 if self.exCount == 0:
                     self.positions = self.resample(tupel)
                     points = [(p[0], p[1]) for p in self.positions]
@@ -74,17 +72,16 @@ class RecognizerNode(Node):
                         self.last_name = name
                         self.last_accuracy = score
 
-                        self.printGesture()
+                        self.paintEl()
                     else:
                         self.last_name = '(Not enough points - try again!)'
                         self.last_accuracy = 0.0
                         print (self.last_name)
                 self.exCount += 1
 
-
-    def printGesture(self):
+    # paint element depending on the gesture recognition
+    def paintEl(self):
         print(self.last_name)
-        print(self.last_accuracy)
 
         if self.last_accuracy > 0.4:
             if self.last_name == 'circle':
@@ -96,9 +93,8 @@ class RecognizerNode(Node):
         else:
             print ("Gesture accuracy was too low, try again please")
 
-
     def paintCircle(self):
-        # random pos
+        # random pos for element
         xPos = random.randint(0, 1200)
         yPos = random.randint(0, 1000)
         ellipse = QtGui.QGraphicsEllipseItem(QtCore.QRectF(xPos, yPos, 50, 50))
@@ -112,7 +108,7 @@ class RecognizerNode(Node):
         self.vb.addItem(ellipse)
 
     def paintRect(self):
-        # random pos
+        # # random pos for element
         xPos = random.randint(0, 1200)
         yPos = random.randint(0, 1000)
         rect = QtGui.QGraphicsRectItem(QtCore.QRectF(xPos, yPos, 50, 50))
@@ -125,17 +121,14 @@ class RecognizerNode(Node):
         self.vb.addItem(rect)
 
     def paintTriangle(self):
-        # random pos
-        print ("painting triangle")
+        # # random pos for element
         xPos = random.randint(0, 1200)
         yPos = random.randint(0, 1000)
 
-        self.polygon = QtGui.QPolygonF([
-                    QtCore.QPointF(-50, 0), QtCore.QPointF(0, 50),
-                    QtCore.QPointF(50, 0)])
-        self.polygon.translate(xPos, yPos)
+        polygon = QtGui.QPolygonF([QtCore.QPointF(-50, 0), QtCore.QPointF(0, 50), QtCore.QPointF(50, 0)])
+        polygon.translate(xPos, yPos)
 
-        triangle = QtGui.QGraphicsPolygonItem(self.polygon)
+        triangle = QtGui.QGraphicsPolygonItem(polygon)
 
         triangle.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
         # random colors
@@ -144,7 +137,8 @@ class RecognizerNode(Node):
 
         self.vb.addItem(triangle)
 
-    def resample(self, point_list,step_count=64):
+    # resample list of points to 64 point
+    def resample(self, point_list, step_count=64):
         newpoints = []
         length = len(point_list)
         stepsize = length/step_count
@@ -155,19 +149,20 @@ class RecognizerNode(Node):
 
             p1 = point_list[i-1]
 
-            d = self.distance(p1,point_list[i])
+            d = self.distance(p1, point_list[i])
 
             if curpos+d >= stepsize:
                 nx = p1[0] + ((stepsize-curpos)/d)*(point_list[i][0]-p1[0])
                 ny = p1[1] + ((stepsize-curpos)/d)*(point_list[i][1]-p1[1])
-                newpoints.append([nx,ny])
-                point_list.insert(i,[nx,ny])
+                newpoints.append([nx, ny])
+                point_list.insert(i, [nx, ny])
                 curpos = 0
             else:
                 curpos += d
             i += 1
         return newpoints
 
+    # distance between to points
     def distance(self, p1, p2):
         d = p2[0] - p1[0]
         if(d < 0):
@@ -176,9 +171,12 @@ class RecognizerNode(Node):
         return d
 
     def randomColor(self):
-        return [random.randint(0,255), random.randint(0,255), random.randint(0,255)]
+        return [random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)]
+
 fclib.registerNodeType(RecognizerNode, [('Data',)])
 
+
+# node which sets the mouse x y pos depending on the input ir data
 class PointerNode(Node):
     nodeName = "Pointer"
 
@@ -204,19 +202,22 @@ class PointerNode(Node):
         self.isAPressed = kwds['aPressed']
         self.isBReleased = kwds['bRel']
 
+        # check if B button is pressed and ir data is not zero
         if self.isBPressed and self.irX != 0 and self.irY != 0:
+            # recalculate the x and y pos of the mouse depending on the ir data and screen size
             xScreen = self.screenSize[0] - int((self.screenSize[0] / 1024) * self.irX)
             yScreen = int((self.screenSize[1] / 760) * self.irY)
 
+            # check if x and y data is valid and move mouse to pos
             if xScreen <= self.screenSize[0] and xScreen >= 0 and yScreen <= self.screenSize[1] and yScreen >= 0:
                 self.mouse.move(xScreen, yScreen)
 
         # when b is released and object is dragged, object is released
-        if self.isBReleased and self.dragging == True:
+        if self.isBReleased and self.dragging:
             self.mouse.click(self.mouse.position()[0], self.mouse.position()[1])
             self.dragging = False
         # when b is not pressed and a is pressed, do a single click
-        if self.isAPressed and self.isBPressed == False:
+        if self.isAPressed and not self.isBPressed:
             self.mouse.click(self.mouse.position()[0], self.mouse.position()[1])
             self.dragging = False
         # when b and a are pressed, do drag
@@ -224,8 +225,8 @@ class PointerNode(Node):
             self.mouse.press(self.mouse.position()[0], self.mouse.position()[1])
             self.dragging = True
 
-
 fclib.registerNodeType(PointerNode, [('Data',)])
+
 
 class MagicWand():
     def __init__(self):
@@ -253,11 +254,9 @@ class MagicWand():
         self.layout.addWidget(self.fc.widget(), 0, 0, 2, 1)
 
         # use bottom defined functions to create widgets, plotting and nodes
-
         self.wiimoteNode()
         self.createWidgets()
         self.bufferPlots()
-
         self.recognizerNode()
         self.pointerNode()
 
@@ -326,7 +325,6 @@ class MagicWand():
         self.fc.connectTerminals(self.wiimoteNode['irXirYTup'], self.recognizer['tupelIn'])
         self.fc.connectTerminals(self.wiimoteNode['oneRel'], self.recognizer['onePressed'])
 
-
     def pointerNode(self):
         self.pointerNode = self.fc.createNode('Pointer', pos=(150, 0))
 
@@ -335,5 +333,6 @@ class MagicWand():
         self.fc.connectTerminals(self.wiimoteNode['b'], self.pointerNode['bPressed'])
         self.fc.connectTerminals(self.wiimoteNode['bRel'], self.pointerNode['bRel'])
         self.fc.connectTerminals(self.wiimoteNode['a'], self.pointerNode['aPressed'])
+
 if __name__ == '__main__':
     mw = MagicWand()

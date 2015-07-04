@@ -9,14 +9,13 @@ from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
 import numpy as np
 import wiimote
-from pymouse import PyMouse
 
 
 class BufferNode(CtrlNode):
     """
     Buffers the last n samples provided on input and provides them as a list of
     length n on output.
-    A spinbox widget allows for setting the size of the buffer. 
+    A spinbox widget allows for setting the size of the buffer.
     Default size is 32 samples.
     """
     nodeName = "Buffer"
@@ -26,12 +25,12 @@ class BufferNode(CtrlNode):
 
     def __init__(self, name):
         terminals = {
-            'dataIn': dict(io='in'),  
-            'dataOut': dict(io='out'), 
+            'dataIn': dict(io='in'),
+            'dataOut': dict(io='out'),
         }
         self._buffer = np.array([])
         CtrlNode.__init__(self, name, terminals=terminals)
-        
+
     def process(self, **kwds):
         size = int(self.ctrls['size'].value())
         self._buffer = np.append(self._buffer, kwds['dataIn'])
@@ -40,24 +39,24 @@ class BufferNode(CtrlNode):
         return {'dataOut': output}
 
 fclib.registerNodeType(BufferNode, [('Data',)])
-        
+
+
 class WiimoteNode(Node):
     """
     Outputs sensor data from a Wiimote.
-    
     Supported sensors: accelerometer (3 axis)
-    Text input box allows for setting a Bluetooth MAC address. 
+    Text input box allows for setting a Bluetooth MAC address.
     Pressing the "connect" button tries connecting to the Wiimote.
-    Update rate can be changed via a spinbox widget. Setting it to "0" 
+    Update rate can be changed via a spinbox widget. Setting it to "0"
     activates callbacks every time a new sensor value arrives (which is
     quite often -> performance hit)
     """
     nodeName = "Wiimote"
-    
+
     def __init__(self, name):
         terminals = {
             'accelX': dict(io='out'),  
-            'accelY': dict(io='out'), 
+            'accelY': dict(io='out'),
             'accelZ': dict(io='out'),
             'irX': dict(io='out'),
             'irY': dict(io='out'),
@@ -75,15 +74,15 @@ class WiimoteNode(Node):
         # Configuration UI
         self.ui = QtGui.QWidget()
         self.layout = QtGui.QGridLayout()
-        
+
         label = QtGui.QLabel("Bluetooth MAC address:")
         self.layout.addWidget(label)
-        
+
         self.text = QtGui.QLineEdit()
-        self.btaddr = "B8:AE:6E:1B:AD:A0" # set some example
+        self.btaddr = "B8:AE:6E:1B:AD:A0"  # set some example
         self.text.setText(self.btaddr)
         self.layout.addWidget(self.text)
-        
+
         label2 = QtGui.QLabel("Update rate (Hz)")
         self.layout.addWidget(label2)
         self._ir_vals = []
@@ -107,7 +106,7 @@ class WiimoteNode(Node):
         self.connect_button.clicked.connect(self.connect_wiimote)
         self.layout.addWidget(self.connect_button)
         self.ui.setLayout(self.layout)
-       
+
         # update timer
         self.update_timer = QtCore.QTimer()
         self.update_timer.timeout.connect(self.update_all_sensors)
@@ -117,16 +116,12 @@ class WiimoteNode(Node):
         self.isBReleased = False
         self.isAPressed = False
 
-
-
-
         # super()
 
         Node.__init__(self, name, terminals=terminals)
-        
 
     def update_all_sensors(self):
-        if self.wiimote == None:
+        if self.wiimote is None:
             return
         self._acc_vals = self.wiimote.accelerometer
         self._ir_vals = self.wiimote.ir
@@ -145,25 +140,24 @@ class WiimoteNode(Node):
     def ctrlWidget(self):
         return self.ui
 
-        
     def connect_wiimote(self):
         self.btaddr = str(self.text.text()).strip()
         if self.wiimote is not None:
             self.wiimote.disconnect()
             self.wiimote = None
             self.connect_button.setText("connect")
-            return 
-        if len(self.btaddr) == 17 :
+            return
+        if len(self.btaddr) == 17:
             self.connect_button.setText("connecting...")
             self.wiimote = wiimote.connect(self.btaddr)
-            if self.wiimote == None:
+            if self.wiimote is None:
                 self.connect_button.setText("try again")
             else:
                 self.connect_button.setText("disconnect")
                 self.set_update_rate(self.update_rate_input.value())
 
     def set_update_rate(self, rate):
-        if rate == 0: # use callbacks for max. update rate
+        if rate == 0:  # use callbacks for max. update rate
             self.update_timer.stop()
             self.wiimote.accelerometer.register_callback(self.update_accel)
             self.wiimote.ir.register_callback(self.update_ir)
@@ -181,7 +175,7 @@ class WiimoteNode(Node):
                 self.irY = ir_obj["y"]
                 self.irS = ir_obj["size"]
         # empty arrays and set boolean flags when 'One' is pressed
-        if self.wiimote.buttons["One"] and self.isOnePressed == False:
+        if self.wiimote.buttons["One"] and not self.isOnePressed:
             self.isOneReleased = False
             self.isOnePressed = True
             self.irXVals = []
@@ -200,24 +194,24 @@ class WiimoteNode(Node):
                 tup = (self.irX, self.irY)
                 self.irXirYTup.append(tup)
         # logic to check if one button is releasd
-        elif self.wiimote.buttons["One"] == False and self.isOnePressed:
+        elif not self.wiimote.buttons["One"] and self.isOnePressed:
             self.isOnePressed = False
             self.isOneReleased = True
         # when one button is not pressed set the boolen flags false
-        elif self.wiimote.buttons["One"] == False:
+        elif not self.wiimote.buttons["One"]:
             self.isOnePressed = False
             self.isOneReleased = False
 
     # set state of b button
     def set_B_button(self):
         # logic to check if b is released
-        if self.isBPressed and self.wiimote.buttons["B"] == False:
+        if self.isBPressed and not self.wiimote.buttons["B"]:
             self.isBReleased = True
         else:
             self.isBReleased = False
 
         # logic to check if b is pressed
-        if self.wiimote.buttons["B"] == False:
+        if not self.wiimote.buttons["B"]:
             self.isBPressed = False
         elif self.wiimote.buttons["B"]:
             self.isBPressed = True
@@ -232,25 +226,24 @@ class WiimoteNode(Node):
     # when no buttons are pressed, the ir values are 0
     # so it's possible to get values only when a button is pressed
     def check_button_pressed(self):
-         if(self.isOnePressed == False and self.isBPressed == False and self.isOnePressed == False):
+        if not self.isOnePressed and not self.isBPressed and not self.isOnePressed:
             self.irX = 0
             self.irY = 0
             self.irS = 0
 
-
     def process(self, **kwdargs):
+        # exeute functions
         self.set_irX_irY()
         self.set_B_button()
         self.set_A_button()
         self.check_button_pressed()
 
-        x,y,z = self._acc_vals
-
+        x, y, z = self._acc_vals
 
         return {'accelX': np.array([x]), 'accelY': np.array([y]), 'accelZ': np.array([z]), 'irX': self.irX, 'irY': self.irY, 'irS': self.irS, 'irXirYTup': self.irXirYTup, 'one': self.isOnePressed, 'oneRel': self.isOneReleased, 'b': self.isBPressed, 'bRel': self.isBReleased,  'a': self.isAPressed}
 
-fclib.registerNodeType(WiimoteNode, [('Sensor',)])
-    
+fclib.registerNodeType(WiimoteNode, [('Sensor', )])
+
 if __name__ == '__main__':
     import sys
     app = QtGui.QApplication([])
@@ -270,7 +263,7 @@ if __name__ == '__main__':
 
     pw1 = pg.PlotWidget()
     layout.addWidget(pw1, 0, 1)
-    pw1.setYRange(0,1024)
+    pw1.setYRange(0, 1024)
 
     pw1Node = fc.createNode('PlotWidget', pos=(0, -150))
     pw1Node.setPlot(pw1)
