@@ -1,0 +1,14 @@
+How is the XWand tracked (provide all relevant details)?
+The XWand's position and orientation is tracked by the Honeywell HMC1023 3-axis magnetoresistive permalloy magnetometer, the Analog Devices ADXL202 2-axis MEMS accelerometer and an Infra-red LED (IR) using a 3-d Model of the room and its contents. 
+To compute the orientation of the XWand accelerometer and magnetometer are combined. The magnetometer has 3 orthogonal axis which senses the degree to which it lies along the direction of the Earth’s magnetic field. Because this is not enough to compute the exact 3-d orientation of the XWand the magnetometer is combined with the accelerometer: "The main idea is to take the accelerometer outputs as pitch and roll, and then use the output of the magnetometer to compute yaw. The calculation of yaw from the magnetometer takes into account the pitch and roll information."
+The magnetometer's range is finally computed online by twirling the minute for circa one minute. In contrast, the range of the accelerometer is determined statically.
+The position of the XWand is computed with a computer-vision based positioning system using two IR-cameras. The cameras are positioned near the ceiling in the room on both sides and are equipped with IR pass filters and wide ange lenses. The filtered output of the camera show only the LEDs of the XWand. So the 2-d position is computed by each camera, which are then
+combined to find the 3-d position by triangulation. All in all "The system requires the position, focal length, lens distortion parameters and other parameters of each camera, computed by camera calibration procedures that are well known in the computer vision literature. "
+
+How are gestures recognized?
+
+For recognizing simple gestures performed with the XWand they look for simple trends
+or peaks in one or more of the sensor values, e.g. analyzing a peak in the accelerometer data.
+To reduce the risk of false positives, gestures are context bound (e.g. pointing at an object while performing the gesture) and the user is required to hold down a button while performing a gesture.
+
+What are the technical differences between the XWand and the WiiMote?
