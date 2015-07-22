@@ -12,3 +12,5 @@ or peaks in one or more of the sensor values, e.g. analyzing a peak in the accel
 To reduce the risk of false positives, gestures are context bound (e.g. pointing at an object while performing the gesture) and the user is required to hold down a button while performing a gesture.
 
 What are the technical differences between the XWand and the WiiMote?
+
+One of the main technical differences between the XWand an the Wiimote is that the Wiimote lacks the magnetometer built in the XWand. The early Wiimote has also lacked a gyroscope, which was later introduced with the Wiimote Plus. To track it's position and orientation the XWand uses the magnetometer, the gyroscope and the accelerometer combined, while the Wiimote Plus just can use it's gyroscope and accelerometer. Furthermore the Wiimote has just one IR-sensor instead of the XWand's two.

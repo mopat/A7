@@ -20,10 +20,14 @@ while True:
         flags=cv2.cv.CV_HAAR_SCALE_IMAGE
     )
 
+    if (len(faces)) == 0:
+        print ("no faces detected")
+
     # Draw a rectangle around the faces
     for (x, y, w, h) in faces:
         cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-
+        if len(faces) >= 2:
+            print (str(len(faces)) + " faces detected")
     # Display the resulting frame
     cv2.imshow('Video', frame)
 
