@@ -1,12 +1,22 @@
 import cv2
 import sys
+#from PyQt4.QtCore import QTimer
+import time
+from threading import Timer
 
 cascPath = sys.argv[1]
 faceCascade = cv2.CascadeClassifier(cascPath)
 
 video_capture = cv2.VideoCapture(0)
 
+
+def timeout():
+    print ("timeout")
+    t.cancel()
+
+
 while True:
+    t = Timer(4, timeout)
     # Capture frame-by-frame
     ret, frame = video_capture.read()
 
@@ -21,7 +31,9 @@ while True:
     )
 
     if (len(faces)) == 0:
-        print ("no faces detected")
+        t.start()
+    else:
+        t.cancel()
 
     # Draw a rectangle around the faces
     for (x, y, w, h) in faces:
@@ -33,6 +45,7 @@ while True:
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
 
 # When everything is done, release the capture
 video_capture.release()
