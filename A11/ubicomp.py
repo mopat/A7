@@ -48,8 +48,7 @@ class UbiComp():
 
 
         # When everything is done, release the capture
-        self.video_capture.release()
-        cv2.destroyAllWindows()
+
 
     def gestureRecognizer(self):
         ret, img = self.video_capture.read()
