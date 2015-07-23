@@ -4,6 +4,7 @@ import numpy as np
 import math
 import time
 from threading import Timer
+import uinput
 
 
 class UbiComp():
@@ -11,6 +12,13 @@ class UbiComp():
         self.video_capture = cv2.VideoCapture(0)
         self.cascPath = sys.argv[1]
         self.faceCascade = cv2.CascadeClassifier(self.cascPath)
+
+        self.device = uinput.Device([
+            uinput.KEY_E,
+            uinput.KEY_H,
+            uinput.KEY_L,
+            uinput.KEY_O,
+        ])
 
         while True:
             self.faceDetector()
@@ -20,6 +28,7 @@ class UbiComp():
             k = cv2.waitKey(10)
             if k == 27:
                 break
+
 
 
     def faceDetector(self):
@@ -97,17 +106,22 @@ class UbiComp():
             #cv2.circle(crop_img,far,5,[0,0,255],-1)
         if count_defects == 1:
             cv2.putText(img,"I am Vipul", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
+            self.device.emit_click(uinput.KEY_H)
         elif count_defects == 2:
             str = "This is a basic hand gesture recognizer"
             print str
             cv2.putText(img, str, (5,50), cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
+            self.device.emit_click(uinput.KEY_E)
         elif count_defects == 3:
             cv2.putText(img,"This is 4 :P", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
+            self.device.emit_click(uinput.KEY_L)
         elif count_defects == 4:
             cv2.putText(img,"Hi!!!", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
+            self.device.emit_click(uinput.KEY_O)
         else:
             cv2.putText(img,"Hello World!!!", (50,50),\
                         cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
+            self.device.emit_click(uinput.KEY_H)
         #cv2.imshow('drawing', drawing)
         #cv2.imshow('end', crop_img)
         cv2.imshow('Gesture', img)
