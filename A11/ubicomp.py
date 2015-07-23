@@ -19,6 +19,9 @@ class UbiComp():
             uinput.KEY_SPACE,
             uinput.KEY_L,
             uinput.KEY_O,
+            uinput.KEY_LEFTCTRL,
+            uinput.KEY_UP,
+            uinput.KEY_DOWN
         ])
 
         self.sn = Sniffer
@@ -52,8 +55,8 @@ class UbiComp():
         # Draw a rectangle around the faces
         for (x, y, w, h) in faces:
             cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-            if len(faces) >= 2:
-                print (str(len(faces)) + " faces detected")
+            #if len(faces) >= 2:
+                #print (str(len(faces)) + " faces detected")
         # Display the resulting frame
         cv2.imshow('Video', frame)
 
@@ -108,19 +111,20 @@ class UbiComp():
             cv2.line(crop_img,start,end,[0,255,0],2)
             #cv2.circle(crop_img,far,5,[0,0,255],-1)
         if count_defects == 1:
-            cv2.putText(img,"I am Vipul", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            self.device.emit_click(uinput.KEY_SPACE)
+            cv2.putText(img,"Volume Down", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
+            self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_DOWN])
         elif count_defects == 2:
-            str = "This is a basic hand gesture recognizer"
+            str = "Volume Up"
             print str
             cv2.putText(img, str, (5,50), cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
-            self.device.emit_click(uinput.KEY_E)
+            self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_UP])
         elif count_defects == 3:
-            cv2.putText(img,"This is 4 :P", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            self.device.emit_click(uinput.KEY_L)
+            cv2.putText(img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
+            #self.device.emit_click(uinput.KEY_L)
+            self.device.emit_click(uinput.KEY_SPACE)
         elif count_defects == 4:
-            cv2.putText(img,"Hi!!!", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            self.device.emit_click(uinput.KEY_O)
+            cv2.putText(img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
+            self.device.emit_click(uinput.KEY_SPACE)
         else:
             cv2.putText(img,"Hello World!!!", (50,50),\
                         cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
