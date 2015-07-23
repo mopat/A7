@@ -5,6 +5,7 @@ import math
 import time
 from threading import Timer
 import uinput
+from sniff_x import Sniffer
 
 
 class UbiComp():
@@ -20,6 +21,7 @@ class UbiComp():
             uinput.KEY_O,
         ])
 
+        self.sn = Sniffer
         while True:
             self.faceDetector()
             self.gestureRecognizer()
@@ -28,6 +30,7 @@ class UbiComp():
             k = cv2.waitKey(10)
             if k == 27:
                 break
+            print(Sniffer.get_cur_window(Sniffer())[2])
 
 
 
