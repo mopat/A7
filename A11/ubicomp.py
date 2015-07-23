@@ -15,7 +15,7 @@ class UbiComp():
 
         self.device = uinput.Device([
             uinput.KEY_E,
-            uinput.KEY_H,
+            uinput.KEY_SPACE,
             uinput.KEY_L,
             uinput.KEY_O,
         ])
@@ -106,7 +106,7 @@ class UbiComp():
             #cv2.circle(crop_img,far,5,[0,0,255],-1)
         if count_defects == 1:
             cv2.putText(img,"I am Vipul", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            self.device.emit_click(uinput.KEY_H)
+            self.device.emit_click(uinput.KEY_SPACE)
         elif count_defects == 2:
             str = "This is a basic hand gesture recognizer"
             print str
@@ -121,7 +121,6 @@ class UbiComp():
         else:
             cv2.putText(img,"Hello World!!!", (50,50),\
                         cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            self.device.emit_click(uinput.KEY_H)
         #cv2.imshow('drawing', drawing)
         #cv2.imshow('end', crop_img)
         cv2.imshow('Gesture', img)
