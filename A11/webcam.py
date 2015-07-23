@@ -13,6 +13,7 @@ video_capture = cv2.VideoCapture(0)
 def timeout():
     print ("timeout")
     t.cancel()
+    #push
 
 
 while True:
