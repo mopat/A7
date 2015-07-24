@@ -15,26 +15,27 @@ class UbiComp():
         self.faceCascade = cv2.CascadeClassifier(self.cascPath)
 
         self.device = uinput.Device([
-            uinput.KEY_E,
             uinput.KEY_SPACE,
-            uinput.KEY_L,
-            uinput.KEY_O,
             uinput.KEY_LEFTCTRL,
             uinput.KEY_UP,
             uinput.KEY_DOWN
         ])
 
-        self.sn = Sniffer
-        while True:
-            self.faceDetector()
-            self.gestureRecognizer()
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-            k = cv2.waitKey(10)
-            if k == 27:
-                break
-            print(Sniffer.get_cur_window(Sniffer())[2])
+        self.VLC_KEY = "VLC media player"
 
+        self.sn = Sniffer()
+
+        while True:
+            print(self.getCurrentWindow())
+            if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
+                self.faceDetector()
+                self.gestureRecognizer()
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+                k = cv2.waitKey(10)
+                if k == 27:
+                    break
+        self.print_some_times()
 
 
     def faceDetector(self):
@@ -133,6 +134,9 @@ class UbiComp():
         cv2.imshow('Gesture', img)
         all_img = np.hstack((drawing, crop_img))
         cv2.imshow('Contours', all_img)
+
+    def getCurrentWindow(self):
+        return Sniffer.get_cur_window(Sniffer())[2]
 
 
 if __name__ == '__main__':
