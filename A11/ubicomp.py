@@ -35,7 +35,6 @@ class UbiComp():
                 k = cv2.waitKey(10)
                 if k == 27:
                     break
-        self.print_some_times()
 
 
     def faceDetector(self):
