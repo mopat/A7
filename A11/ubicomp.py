@@ -13,7 +13,7 @@ class UbiComp():
         self.video_capture = cv2.VideoCapture(0)
         self.cascPath = sys.argv[1]
         self.faceCascade = cv2.CascadeClassifier(self.cascPath)
-
+        self.playPauseTimer = False
         self.device = uinput.Device([
             uinput.KEY_SPACE,
             uinput.KEY_LEFTCTRL,
@@ -26,7 +26,6 @@ class UbiComp():
         self.sn = Sniffer()
 
         while True:
-            print(self.getCurrentWindow())
             if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
                 self.faceDetector()
                 self.gestureRecognizer()
@@ -35,6 +34,19 @@ class UbiComp():
                 k = cv2.waitKey(10)
                 if k == 27:
                     break
+
+
+    def stopwatch(self, seconds):
+        self.playPauseTimer = True
+        start = time.time()
+        time.clock()
+        elapsed = 0
+        while elapsed < seconds:
+            self.playPauseTimer = False
+            elapsed = time.time() - start
+            print "loop cycle time: %f, seconds count: %02d" % (time.clock() , elapsed)
+            time.sleep(1)
+            break
 
 
     def faceDetector(self):
@@ -58,9 +70,7 @@ class UbiComp():
             #if len(faces) >= 2:
                 #print (str(len(faces)) + " faces detected")
         # Display the resulting frame
-        cv2.imshow('Video', frame)
-
-
+        #cv2.imshow('Video', frame)
 
         # When everything is done, release the capture
 
@@ -74,7 +84,7 @@ class UbiComp():
         blurred = cv2.GaussianBlur(grey, value, 0)
         _, thresh1 = cv2.threshold(blurred, 127, 255,
                                    cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
-        cv2.imshow('Thresholded', thresh1)
+        #cv2.imshow('Thresholded', thresh1)
         contours, hierarchy = cv2.findContours(thresh1.copy(),cv2.RETR_TREE, \
                 cv2.CHAIN_APPROX_NONE)
         max_area = -1
@@ -118,13 +128,15 @@ class UbiComp():
             print str
             cv2.putText(img, str, (5,50), cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
             self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_UP])
-        elif count_defects == 3:
+        elif count_defects == 3 and self.playPauseTimer == False:
             cv2.putText(img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
             #self.device.emit_click(uinput.KEY_L)
             self.device.emit_click(uinput.KEY_SPACE)
-        elif count_defects == 4:
+            self.stopwatch(2)
+        elif count_defects == 4 and self.playPauseTimer == False:
             cv2.putText(img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
             self.device.emit_click(uinput.KEY_SPACE)
+            self.stopwatch(2)
         else:
             cv2.putText(img,"Hello World!!!", (50,50),\
                         cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
