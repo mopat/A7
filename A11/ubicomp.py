@@ -4,14 +4,16 @@ import numpy as np
 import math
 import time
 import uinput
+import speech_recognition as sr
 from sniff_x import Sniffer
 from Tkinter import *
+from thread import start_new_thread
 
 
 class UbiComp():
     def __init__(self):
         self.video_capture = cv2.VideoCapture(0)
-        self.cascPath = sys.argv[1]
+        self.cascPath = "haarcascade_frontalface_default.xml"
         self.faceCascade = cv2.CascadeClassifier(self.cascPath)
         self.playPauseTimer = False
         self.device = uinput.Device([
@@ -24,12 +26,15 @@ class UbiComp():
         self.VLC_KEY = "VLC media player"
         self.infoTextBox()
 
+        start_new_thread(self.speechRecognition, (2,))
         self.sn = Sniffer()
         while True:
+
             if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
                 self.faceDetector()
                 if self.playPauseTimer == False:
                     self.gestureRecognizer()
+
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
                 k = cv2.waitKey(10)
@@ -37,6 +42,26 @@ class UbiComp():
                     break
 
                 time.sleep(0.05)
+
+    def speechRecognition(self, i):
+        while True:
+            r = sr.Recognizer()
+            with sr.Microphone() as source:                # use the default microphone as the audio source
+                audio = r.listen(source)                   # listen for the first phrase and extract it into audio data
+
+            try:
+                voice = r.recognize(audio)
+                if voice == "play" or voice == "stop":
+                    self.device.emit_click(uinput.KEY_SPACE)
+                elif voice == "volume up":
+                    for i in range(5):
+                        self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_UP])
+                elif voice == "volume down":
+                    for i in range(5):
+                        self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_DOWN])
+                print("You said: " + voice)    # recognize speech using Google Speech Recognition
+            except LookupError:                            # speech is unintelligible
+                print("Could not understand audio")
 
 
     def infoTextBox(self):
@@ -127,11 +152,11 @@ class UbiComp():
         elif count_defects == 3:
             cv2.putText(img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
             self.device.emit_click(uinput.KEY_SPACE)
-            self.pauseAndStartVideo()
+            self.pauseAndStartVideo(2)
         elif count_defects == 4:
             cv2.putText(img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
             self.device.emit_click(uinput.KEY_SPACE)
-            self.pauseAndStartVideo()
+            self.pauseAndStartVideo(2)
         else:
             cv2.putText(img,"Finger Control", (50,50),\
                         cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
@@ -141,10 +166,10 @@ class UbiComp():
         all_img = np.hstack((drawing, crop_img))
         cv2.imshow('Contours', all_img)
 
-    def pauseAndStartVideo(self):
+    def pauseAndStartVideo(self, sec):
         self.playPauseTimer = True
         self.video_capture.release()
-        time.sleep(2)
+        time.sleep(sec)
         self.video_capture = cv2.VideoCapture(0)
         self.playPauseTimer = False
 

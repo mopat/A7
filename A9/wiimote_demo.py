@@ -3,7 +3,7 @@
 import wiimote
 import time
 import sys
-    
+
 input("Press the 'sync' button on the back of your Wiimote Plus " +
           "or buttons (1) and (2) on your classic Wiimote.\n" +
           "Press <return> once the Wiimote's LEDs start blinking.")
