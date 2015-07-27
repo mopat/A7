@@ -3,9 +3,9 @@ import sys
 import numpy as np
 import math
 import time
-from threading import Timer
 import uinput
 from sniff_x import Sniffer
+from Tkinter import *
 
 
 class UbiComp():
@@ -22,32 +22,30 @@ class UbiComp():
         ])
 
         self.VLC_KEY = "VLC media player"
+        self.infoTextBox()
 
         self.sn = Sniffer()
-
         while True:
             if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
                 self.faceDetector()
-                self.gestureRecognizer()
+                if self.playPauseTimer == False:
+                    self.gestureRecognizer()
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
                 k = cv2.waitKey(10)
                 if k == 27:
                     break
 
+                time.sleep(0.05)
 
-    '''def stopwatch(self, seconds):
-        self.playPauseTimer = True
-        start = time.time()
-        time.clock()
-        elapsed = 0
-        while elapsed < seconds:
-            self.playPauseTimer = False
-            elapsed = time.time() - start
-            print "loop cycle time: %f, seconds count: %02d" % (time.clock() , elapsed)
-            time.sleep(1)
-            break'''
 
+    def infoTextBox(self):
+        root = Tk()
+        root.title("Instructions")
+        T = Text(root, height=20, width=150)
+        T.pack()
+        T.insert(END, "VLC CONTROLLER\nStep 1: Open VLC Media Player\nStep 2: Use rectangle box to detect hand gestures\n1 Finger: ...\nClose Instructions to start")
+        mainloop()
 
     def faceDetector(self):
         # Capture frame-by-frame
@@ -70,7 +68,7 @@ class UbiComp():
             #if len(faces) >= 2:
                 #print (str(len(faces)) + " faces detected")
         # Display the resulting frame
-        #cv2.imshow('Video', frame)
+        cv2.imshow('Video', frame)
 
         # When everything is done, release the capture
 
@@ -124,29 +122,31 @@ class UbiComp():
             cv2.putText(img,"Volume Down", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
             self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_DOWN])
         elif count_defects == 2:
-            str = "Volume Up"
-            print str
-            cv2.putText(img, str, (5,50), cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
+            cv2.putText(img, "Volume Up", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
             self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_UP])
-        elif count_defects == 3 and self.playPauseTimer == False:
+        elif count_defects == 3:
             cv2.putText(img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            #self.device.emit_click(uinput.KEY_L)
             self.device.emit_click(uinput.KEY_SPACE)
-            time.sleep(2)
-            #self.stopwatch(2)
-        elif count_defects == 4 and self.playPauseTimer == False:
+            self.pauseAndStartVideo()
+        elif count_defects == 4:
             cv2.putText(img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            time.sleep(2)
             self.device.emit_click(uinput.KEY_SPACE)
-            #self.stopwatch(2)
+            self.pauseAndStartVideo()
         else:
-            cv2.putText(img,"Hello World!!!", (50,50),\
+            cv2.putText(img,"Finger Control", (50,50),\
                         cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
         #cv2.imshow('drawing', drawing)
         #cv2.imshow('end', crop_img)
         cv2.imshow('Gesture', img)
         all_img = np.hstack((drawing, crop_img))
         cv2.imshow('Contours', all_img)
+
+    def pauseAndStartVideo(self):
+        self.playPauseTimer = True
+        self.video_capture.release()
+        time.sleep(2)
+        self.video_capture = cv2.VideoCapture(0)
+        self.playPauseTimer = False
 
     def getCurrentWindow(self):
         return Sniffer.get_cur_window(Sniffer())[2]
