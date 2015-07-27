@@ -5,7 +5,7 @@ import math
 import time
 import uinput
 import speech_recognition as sr
-#from sniff_x import Sniffer
+from sniff_x import Sniffer
 from Tkinter import *
 from thread import start_new_thread
 
@@ -26,14 +26,14 @@ class UbiComp():
         self.VLC_KEY = "VLC media player"
         self.infoTextBox()
 
-        #start_new_thread(self.speechRecognition, (2,))
-        #self.sn = Sniffer()
+        start_new_thread(self.speechRecognition, (2,))
+        self.sn = Sniffer()
         while True:
 
-            #if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
-            self.faceDetector()
-            #if self.playPauseTimer == False:
-                #self.gestureRecognizer()
+            if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
+                self.faceDetector()
+                if self.playPauseTimer == False:
+                    self.gestureRecognizer()
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
