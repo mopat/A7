@@ -43,7 +43,7 @@ class UbiComp():
             if k == 27:
                 break
 
-            time.sleep(0.05)
+            #time.sleep(0.05)
 
     def speechRecognition(self, i):
         while True:
@@ -71,6 +71,7 @@ class UbiComp():
             time.clock()
             elapsed = 0
             while elapsed < seconds:
+                print("SOPTWATCH")
                 elapsed = time.time() - start
                 #print "loop cycle time: %f, seconds count: %02d" % (time.clock() , elapsed)
             if elapsed == seconds:
@@ -85,7 +86,7 @@ class UbiComp():
         root.title("Instructions")
         T = Text(root, height=20, width=150)
         T.pack()
-        T.insert(END, "VLC CONTROLLER\nStep 1: Open VLC Media Player\nStep 2: Use rectangle box to detect hand gestures\n1 Finger: ...\nClose Instructions to start")
+        T.insert(END, "VLC Controller is a simple controller for the popular VLC Media Player using face detection and finger recognition with you webcam.\nFunctions\nFace Detection: \n- pause video when no face is detected after three seconds\n- play when face is detected again\n\nFinger Recognition in the appropriate rectangle on the right of the opening webcam window:\n- two fingers: volume down\n- three fingers: volume up\n- four/five fingers: play/pause\n\nSteps\n1: start script ubicomp.py with sudo python ubicomp.py\n2: open VLC Media Player\n3: Drag and Drop Video in VLC\n4: use rectangle box to recognize finger count \n5: use face detection\n\nCLOSE INSTRUCTIONS TO START! Have fun!")
         mainloop()
 
     def faceDetector(self):
@@ -108,7 +109,7 @@ class UbiComp():
         #if len(faces) >= 2:
             #print (str(len(faces)) + " faces detected")
 
-        if len(faces) == 0 & self.isZero == False:
+        if len(faces) == 0 and self.isZero == False:
             if self.playPauseTimer == False:
                 self.isZero = True
                 self.timerRunning = True
@@ -133,7 +134,7 @@ class UbiComp():
             gray,
             scaleFactor=1.1,
             minNeighbors=5,
-            minSize=(30, 30), 
+            minSize=(30, 30),
             flags=cv2.cv.CV_HAAR_SCALE_IMAGE
         )
 
@@ -151,6 +152,7 @@ class UbiComp():
                 self.stopwatch(3)
 
         if len(faces) > 0:
+            print("FACEEEEEEEEEEEEEEs")
             self.timerRunning = False
             if self.playPauseTimer == True:
                 self.startVideo(2)
@@ -233,15 +235,15 @@ class UbiComp():
     def pauseVideo(self, sec):
         self.device.emit_click(uinput.KEY_SPACE)
         self.playPauseTimer = True
-        self.video_capture.release()
-        time.sleep(sec)
-        self.video_capture = cv2.VideoCapture(0)
+        #self.video_capture.release()
+        #time.sleep(sec)
+        #self.video_capture = cv2.VideoCapture(0)
 
     def startVideo(self, sec):
         self.device.emit_click(uinput.KEY_SPACE)
         self.playPauseTimer = False
         #self.video_capture.release()
-        time.sleep(sec)
+        #time.sleep(sec)
         #self.video_capture = cv2.VideoCapture(0)
 
     def getCurrentWindow(self):
