@@ -5,12 +5,10 @@ import math
 import time
 import uinput
 import speech_recognition as sr
-from sniff_x import Sniffer
+#from sniff_x import Sniffer
 from Tkinter import *
 from thread import start_new_thread
 from multiprocessing import Process
-
-
 class UbiComp():
     def __init__(self):
         self.video_capture = cv2.VideoCapture(0)
@@ -26,33 +24,26 @@ class UbiComp():
             uinput.KEY_UP,
             uinput.KEY_DOWN
         ])
-
         self.VLC_KEY = "VLC media player"
         self.infoTextBox()
-
         #start_new_thread(self.speechRecognition, (2,))
         #self.sn = Sniffer()
         while True:
-
-            if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
-                #self.faceDetector()
+            #if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
+            self.faceDetector()
             #if self.playPauseTimer == False:
-                self.gestureRecognizer()
-
+                #    self.gestureRecognizer()
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
             k = cv2.waitKey(10)
             if k == 27:
                 break
-
-            #time.sleep(0.05)
-
+            time.sleep(0.05)
     def speechRecognition(self, i):
         while True:
             r = sr.Recognizer()
             with sr.Microphone() as source:                # use the default microphone as the audio source
                 audio = r.listen(source)                   # listen for the first phrase and extract it into audio data
-
             try:
                 voice = r.recognize(audio)
                 if voice == "play" or voice == "stop":
@@ -73,30 +64,27 @@ class UbiComp():
             time.clock()
             elapsed = 0
             while elapsed < seconds:
-                print("SOPTWATCH")
                 elapsed = time.time() - start
                 #print elapsed
                 #print "loop cycle time: %f, seconds count: %02d" % (time.clock() , elapsed)
             if elapsed == seconds:
-
                 print "Pause"
                 self.isZero = False
                 self.timerRunning = False
                 self.pauseVideo(2)
-
+                self.timerProcess.terminate()
     def infoTextBox(self):
         root = Tk()
         root.title("Instructions")
         T = Text(root, height=20, width=150)
         T.pack()
-        T.insert(END, "VLC Controller is a simple controller for the popular VLC Media Player using face detection and finger recognition with you webcam.\nFunctions\nFace Detection: \n- pause video when no face is detected after three seconds\n- play when face is detected again\n\nFinger Recognition in the appropriate rectangle on the right of the opening webcam window:\n- two fingers: volume down\n- three fingers: volume up\n- four/five fingers: play/pause\n\nSteps\n1: start script ubicomp.py with sudo python ubicomp.py\n2: open VLC Media Player\n3: Drag and Drop Video in VLC\n4: use rectangle box to recognize finger count \n5: use face detection\n\nCLOSE INSTRUCTIONS TO START! Have fun!")
+        T.insert(END, "VLC CONTROLLER\nStep 1: Open VLC Media Player\nStep 2: Use rectangle box to detect hand gestures\n1 Finger: ...\nClose Instructions to start")
         mainloop()
-
     def faceDetector(self):
         # Capture frame-by-frame
+        print self.timerProcess.is_alive()
         ret, frame = self.video_capture.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
         faces = self.faceCascade.detectMultiScale(
             gray,
             scaleFactor=1.1,
@@ -104,75 +92,35 @@ class UbiComp():
             minSize=(30, 30),
             flags=cv2.cv.CV_HAAR_SCALE_IMAGE
         )
-
-
         # Draw a rectangle around the faces
         for (x, y, w, h) in faces:
             cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
         #if len(faces) >= 2:
             #print (str(len(faces)) + " faces detected")
-
         if len(faces) == 0 and self.isZero == False:
             if self.playPauseTimer == False:
                 self.isZero = True
                 self.timerRunning = True
                 #self.stopwatch(3),))
-
-                if self.timerProcess.is_alive() == True:
-                    self.timerProcess.terminate()
-
+                print("HEEEEE")
                 if self.timerProcess.is_alive() == False:
                     self.timerProcess.start()
-                    print self.timerProcess.is_alive()
 
-        if len(faces) > 0:
+                #self.timerProcess.terminate()
+        elif len(faces) > 0:
+            self.isZero = False
             self.timerRunning = False
-
-            #self.timerProcess.terminate()
+            if self.timerProcess.is_alive():
+                print("TERMINATE")
+                self.timerProcess = Process(target=self.stopwatch, args=(2,))
 
             if self.playPauseTimer == True:
                 self.startVideo(2)
-
         # Display the resulting frame
-        #cv2.imshow('Video', frame)
-
+        cv2.imshow('Video', frame)
         # When everything is done, release the capture
-
-
     def gestureRecognizer(self):
         ret, img = self.video_capture.read()
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-        faces = self.faceCascade.detectMultiScale(
-            gray,
-            scaleFactor=1.1,
-            minNeighbors=5,
-            minSize=(30, 30),
-            flags=cv2.cv.CV_HAAR_SCALE_IMAGE
-        )
-
-
-        # Draw a rectangle around the faces
-        for (x, y, w, h) in faces:
-            cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        #if len(faces) >= 2:
-            #print (str(len(faces)) + " faces detected")
-
-        if len(faces) == 0 & self.isZero == False:
-            if self.playPauseTimer == False:
-                self.isZero = True
-                self.timerRunning = True
-                self.stopwatch(3)
-
-        if len(faces) > 0:
-            print("FACEEEEEEEEEEEEEEs")
-            self.timerRunning = False
-            if self.playPauseTimer == True:
-                self.startVideo(2)
-
-        # Display the resulting frame
-
-        # When everything is done, release the capture
         cv2.rectangle(img,(300,300),(100,100),(0,255,0),0)
         crop_img = img[100:300, 100:300]
         grey = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
@@ -236,7 +184,6 @@ class UbiComp():
         cv2.imshow('Gesture', img)
         all_img = np.hstack((drawing, crop_img))
         cv2.imshow('Contours', all_img)
-
     def pauseAndStartVideo(self, sec):
         self.device.emit_click(uinput.KEY_SPACE)
         self.playPauseTimer = True
@@ -244,24 +191,19 @@ class UbiComp():
         time.sleep(sec)
         self.video_capture = cv2.VideoCapture(0)
         self.playPauseTimer = False
-
     def pauseVideo(self, sec):
         self.device.emit_click(uinput.KEY_SPACE)
         self.playPauseTimer = True
-        #self.video_capture.release()
-        #time.sleep(sec)
-        #self.video_capture = cv2.VideoCapture(0)
-
+        self.video_capture.release()
+        time.sleep(sec)
+        self.video_capture = cv2.VideoCapture(0)
     def startVideo(self, sec):
         self.device.emit_click(uinput.KEY_SPACE)
         self.playPauseTimer = False
-        #self.video_capture.release()
-        #time.sleep(sec)
-        #self.video_capture = cv2.VideoCapture(0)
-
+        self.video_capture.release()
+        time.sleep(sec)
+        self.video_capture = cv2.VideoCapture(0)
     def getCurrentWindow(self):
         return Sniffer.get_cur_window(Sniffer())[2]
-
-
 if __name__ == '__main__':
     uc = UbiComp()
