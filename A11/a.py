@@ -69,9 +69,10 @@ class UbiComp():
                 #print "loop cycle time: %f, seconds count: %02d" % (time.clock() , elapsed)
             if elapsed == seconds:
                 print "Pause"
-                self.isZero = False
-                self.timerRunning = False
-                self.pauseVideo(2)
+
+                self.device.emit_click(uinput.KEY_SPACE)
+                    #self.pauseVideo(2)
+
 
 
     def infoTextBox(self):
@@ -104,7 +105,12 @@ class UbiComp():
                 self.timerRunning = True
                 #self.stopwatch(3),))
                 print("HEEEEE")
+
+                if self.timerProcess.is_alive():
+                    self.timerProcess.terminate()
+                    self.timerProcess  = Process(target=self.stopwatch, args=(2,))
                 if self.timerProcess.is_alive() == False:
+                    self.timerProcess  = Process(target=self.stopwatch, args=(2,))
                     self.timerProcess.start()
 
                 #self.timerProcess.terminate()
