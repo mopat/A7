@@ -57,9 +57,9 @@ while(cap.isOpened()):
         cv2.putText(img,"This is 4 :P", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
     elif count_defects == 4:
         cv2.putText(img,"Hi!!!", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-    else:
-        cv2.putText(img,"Hello World!!!", (50,50),\
-                    cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
+    #else:
+        #cv2.putText(img,"Hello World!!!", (50,50),\
+                    #cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
     #cv2.imshow('drawing', drawing)
     #cv2.imshow('end', crop_img)
     cv2.imshow('Gesture', img)

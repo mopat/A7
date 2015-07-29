@@ -8,6 +8,7 @@ import speech_recognition as sr
 from sniff_x import Sniffer
 from Tkinter import *
 from thread import start_new_thread
+from multiprocessing import Process
 
 
 class UbiComp():
@@ -18,6 +19,7 @@ class UbiComp():
         self.playPauseTimer = False
         self.isZero = False
         self.timerRunning = False
+        self.timerProcess = Process(target=self.stopwatch, args=(2,))
         self.device = uinput.Device([
             uinput.KEY_SPACE,
             uinput.KEY_LEFTCTRL,
@@ -72,13 +74,14 @@ class UbiComp():
             elapsed = 0
             while elapsed < seconds:
                 elapsed = time.time() - start
+                #print elapsed
                 #print "loop cycle time: %f, seconds count: %02d" % (time.clock() , elapsed)
             if elapsed == seconds:
+
                 print "Pause"
                 self.isZero = False
                 self.timerRunning = False
                 self.pauseVideo(2)
-
 
     def infoTextBox(self):
         root = Tk()
@@ -112,10 +115,20 @@ class UbiComp():
             if self.playPauseTimer == False:
                 self.isZero = True
                 self.timerRunning = True
-                self.stopwatch(3)
+                #self.stopwatch(3),))
+
+                if self.timerProcess.is_alive() == True:
+                    self.timerProcess.terminate()
+
+                if self.timerProcess.is_alive() == False:
+                    self.timerProcess.start()
+                    print self.timerProcess.is_alive()
 
         if len(faces) > 0:
             self.timerRunning = False
+
+            #self.timerProcess.terminate()
+
             if self.playPauseTimer == True:
                 self.startVideo(2)
 
