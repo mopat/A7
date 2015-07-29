@@ -69,10 +69,12 @@ class UbiComp():
                 #print "loop cycle time: %f, seconds count: %02d" % (time.clock() , elapsed)
             if elapsed == seconds:
                 print "Pause"
+                self.timerProcess = Process(target=self.stopwatch, args=(2,))
                 self.isZero = False
                 self.timerRunning = False
                 self.pauseVideo(2)
-                self.timerProcess.terminate()
+
+
     def infoTextBox(self):
         root = Tk()
         root.title("Instructions")
