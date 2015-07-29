@@ -1,0 +1,22 @@
+VLC Controller is a simple controller for the popular VLC Media Player using face detection and finger recognition with you webcam.
+Functions
+Face Detection:
+- pause video when no face is detected after three seconds
+- play when face is detected again
+
+Finger Recognition in the appropriate rectangle on the right of the opening webcam window:
+- two fingers: volume down
+- three fingers: volume up
+- four/five fingers: play/pause
+
+Steps
+1: start script ubicomp.py with sudo python ubicomp.py
+2: open VLC Media Player
+3: Drag and Drop Video in VLC
+4: use rectangle box to recognize finger count
+5: use face detection
+
+CLOSE INSTRUCTIONS TO START! Have fun!
+
+
+"VLC Controller is a simple controller for the popular VLC Media Player using face detection and finger recognition with you webcam.\nFunctions\nFace Detection: \n- pause video when no face is detected after three seconds\n- play when face is detected again\n\nFinger Recognition in the appropriate rectangle on the right of the opening webcam window:\n- two fingers: volume down\n- three fingers: volume up\n- four/five fingers: play/pause\n\nSteps\n1: start script ubicomp.py with sudo python ubicomp.py\n2: open VLC Media Player\n3: Drag and Drop Video in VLC\n4: use rectangle box to recognize finger count \n5: use face detection\n\nCLOSE INSTRUCTIONS TO START! Have fun!"
