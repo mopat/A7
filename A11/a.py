@@ -30,7 +30,7 @@ class UbiComp():
         #self.sn = Sniffer()
         while True:
             #if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
-            self.faceDetector()
+            self.gestureRecognizer()
             #if self.playPauseTimer == False:
                 #    self.gestureRecognizer()
             if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -129,6 +129,51 @@ class UbiComp():
         # When everything is done, release the capture
     def gestureRecognizer(self):
         ret, img = self.video_capture.read()
+
+         # Capture frame-by-frame
+        print self.timerProcess.is_alive()
+
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        faces = self.faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(30, 30),
+            flags=cv2.cv.CV_HAAR_SCALE_IMAGE
+        )
+        # Draw a rectangle around the faces
+        for (x, y, w, h) in faces:
+            cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        #if len(faces) >= 2:
+            #print (str(len(faces)) + " faces detected")
+        if len(faces) == 0 and self.isZero == False:
+            if self.playPauseTimer == False:
+                self.isZero = True
+                self.timerRunning = True
+                #self.stopwatch(3),))
+                print("HEEEEE")
+
+                if self.timerProcess.is_alive():
+                    self.timerProcess.terminate()
+                    self.timerProcess  = Process(target=self.stopwatch, args=(2,))
+                if self.timerProcess.is_alive() == False:
+                    self.timerProcess  = Process(target=self.stopwatch, args=(2,))
+                    self.timerProcess.start()
+
+                #self.timerProcess.terminate()
+        elif len(faces) > 0:
+            self.isZero = False
+            self.timerRunning = False
+            if self.timerProcess.is_alive():
+                print("TERMINATE")
+                self.timerProcess.terminate()
+                self.timerProcess = Process(target=self.stopwatch, args=(2,))
+
+            if self.playPauseTimer == True:
+                self.startVideo(2)
+        # Display the resulting frame
+
+        # When everything is done, release the capture
         cv2.rectangle(img,(300,300),(100,100),(0,255,0),0)
         crop_img = img[100:300, 100:300]
         grey = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
