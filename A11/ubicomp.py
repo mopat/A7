@@ -71,17 +71,13 @@ class UbiComp():
             time.clock()
             elapsed = 0
             while elapsed < seconds:
-                #self.playPauseTimer = False
                 elapsed = time.time() - start
-                #print elapsed
                 #print "loop cycle time: %f, seconds count: %02d" % (time.clock() , elapsed)
-                #self.device.emit_click(uinput.KEY_SPACE)
             if elapsed == seconds:
                 print "Pause"
-                #self.playPauseTimer = True
                 self.isZero = False
                 self.timerRunning = False
-                self.pauseAndStartVideo(2)
+                self.pauseVideo(2)
 
 
     def infoTextBox(self):
@@ -119,9 +115,9 @@ class UbiComp():
                 self.stopwatch(3)
 
         if len(faces) > 0:
-            #self.isZero = False
-            print "switch zero"
             self.timerRunning = False
+            if self.playPauseTimer == True:
+                self.startVideo(2)
 
         # Display the resulting frame
         cv2.imshow('Video', frame)
@@ -182,11 +178,9 @@ class UbiComp():
             self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_UP])
         elif count_defects == 3:
             cv2.putText(img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            self.device.emit_click(uinput.KEY_SPACE)
             self.pauseAndStartVideo(2)
         elif count_defects == 4:
             cv2.putText(img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            self.device.emit_click(uinput.KEY_SPACE)
             self.pauseAndStartVideo(2)
         else:
             cv2.putText(img,"Finger Control", (50,50),\
@@ -198,11 +192,26 @@ class UbiComp():
         cv2.imshow('Contours', all_img)
 
     def pauseAndStartVideo(self, sec):
+        self.device.emit_click(uinput.KEY_SPACE)
         self.playPauseTimer = True
         self.video_capture.release()
         time.sleep(sec)
         self.video_capture = cv2.VideoCapture(0)
         self.playPauseTimer = False
+
+    def pauseVideo(self, sec):
+        self.device.emit_click(uinput.KEY_SPACE)
+        self.playPauseTimer = True
+        self.video_capture.release()
+        time.sleep(sec)
+        self.video_capture = cv2.VideoCapture(0)
+
+    def startVideo(self, sec):
+        self.device.emit_click(uinput.KEY_SPACE)
+        self.playPauseTimer = False
+        self.video_capture.release()
+        time.sleep(sec)
+        self.video_capture = cv2.VideoCapture(0)
 
     def getCurrentWindow(self):
         return Sniffer.get_cur_window(Sniffer())[2]
