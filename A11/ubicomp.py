@@ -5,7 +5,7 @@ import math
 import time
 import uinput
 import speech_recognition as sr
-#from sniff_x import Sniffer
+from sniff_x import Sniffer
 from Tkinter import *
 from thread import start_new_thread
 
@@ -32,10 +32,10 @@ class UbiComp():
         #self.sn = Sniffer()
         while True:
 
-            #if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
-            self.faceDetector()
+            if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
+                #self.faceDetector()
             #if self.playPauseTimer == False:
-                #    self.gestureRecognizer()
+                self.gestureRecognizer()
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -120,13 +120,44 @@ class UbiComp():
                 self.startVideo(2)
 
         # Display the resulting frame
-        cv2.imshow('Video', frame)
+        #cv2.imshow('Video', frame)
 
         # When everything is done, release the capture
 
 
     def gestureRecognizer(self):
         ret, img = self.video_capture.read()
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        faces = self.faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(30, 30), 
+            flags=cv2.cv.CV_HAAR_SCALE_IMAGE
+        )
+
+
+        # Draw a rectangle around the faces
+        for (x, y, w, h) in faces:
+            cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        #if len(faces) >= 2:
+            #print (str(len(faces)) + " faces detected")
+
+        if len(faces) == 0 & self.isZero == False:
+            if self.playPauseTimer == False:
+                self.isZero = True
+                self.timerRunning = True
+                self.stopwatch(3)
+
+        if len(faces) > 0:
+            self.timerRunning = False
+            if self.playPauseTimer == True:
+                self.startVideo(2)
+
+        # Display the resulting frame
+
+        # When everything is done, release the capture
         cv2.rectangle(img,(300,300),(100,100),(0,255,0),0)
         crop_img = img[100:300, 100:300]
         grey = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
@@ -209,9 +240,9 @@ class UbiComp():
     def startVideo(self, sec):
         self.device.emit_click(uinput.KEY_SPACE)
         self.playPauseTimer = False
-        self.video_capture.release()
+        #self.video_capture.release()
         time.sleep(sec)
-        self.video_capture = cv2.VideoCapture(0)
+        #self.video_capture = cv2.VideoCapture(0)
 
     def getCurrentWindow(self):
         return Sniffer.get_cur_window(Sniffer())[2]
