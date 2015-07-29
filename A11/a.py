@@ -65,18 +65,19 @@ class UbiComp():
                 print("Could not understand audio")
 
     def stopwatch(self, seconds):
-
         start = time.time()
         time.clock()
         elapsed = 0
         while elapsed < seconds:
             elapsed = time.time() - start
-            #print elapsed
-            #print "loop cycle time: %f, seconds count: %02d" % (time.clock() , elapsed)
-        if elapsed == seconds:
-            print "Pause"
-            self.device.emit_click(uinput.KEY_SPACE)
 
+        if elapsed == seconds:
+            print "Play/Pause"
+            self.device.emit_click(uinput.KEY_SPACE)
+            if self.playPauseTimer == True:
+                self.playPauseTimer == False
+            else:
+                self.playPauseTimer == True
 
 
     def infoTextBox(self):
@@ -90,7 +91,6 @@ class UbiComp():
 
 
          # Capture frame-by-frame
-        print self.timerProcess.is_alive()
 
         gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         faces = self.faceCascade.detectMultiScale(
@@ -103,14 +103,11 @@ class UbiComp():
         # Draw a rectangle around the faces
         for (x, y, w, h) in faces:
             cv2.rectangle(self.img, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        #if len(faces) >= 2:
-            #print (str(len(faces)) + " faces detected")
+
         if len(faces) == 0 and self.isZero == False:
             if self.playPauseTimer == False:
                 self.isZero = True
                 self.timerRunning = True
-                #self.stopwatch(3),))
-                print("HEEEEE")
 
                 if self.timerProcess.is_alive():
                     self.timerProcess.terminate()
@@ -119,7 +116,6 @@ class UbiComp():
                     self.timerProcess  = Process(target=self.stopwatch, args=(2,))
                     self.timerProcess.start()
 
-                #self.timerProcess.terminate()
         elif len(faces) > 0:
             self.isZero = False
             self.timerRunning = False
