@@ -30,8 +30,11 @@ class UbiComp():
         #self.sn = Sniffer()
         try:
             while True:
+                self.ret, self.img = self.video_capture.read()
                 #if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
+                self.faceDetector()
                 self.gestureRecognizer()
+
                 #if self.playPauseTimer == False:
                     #    self.gestureRecognizer()
                 if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -84,55 +87,12 @@ class UbiComp():
         T.insert(END, "VLC Controller is a simple controller for the popular VLC Media Player using face detection and finger recognition with you webcam.\nFunctions\nFace Detection: \n- pause video when no face is detected after three seconds\n- play when face is detected again\n\nFinger Recognition in the appropriate rectangle on the right of the opening webcam window:\n- two fingers: volume down\n- three fingers: volume up\n- four/five fingers: play/pause\n\nSteps\n1: start script ubicomp.py with sudo python ubicomp.py\n2: open VLC Media Player\n3: Drag and Drop Video in VLC\n4: use rectangle box to recognize finger count \n5: use face detection\n\nCLOSE INSTRUCTIONS TO START! Have fun!\nKill application: CTRL + C")
         mainloop()
     def faceDetector(self):
-        # Capture frame-by-frame
-        print self.timerProcess.is_alive()
-        ret, frame = self.video_capture.read()
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = self.faceCascade.detectMultiScale(
-            gray,
-            scaleFactor=1.1,
-            minNeighbors=5,
-            minSize=(30, 30),
-            flags=cv2.cv.CV_HAAR_SCALE_IMAGE
-        )
-        # Draw a rectangle around the faces
-        for (x, y, w, h) in faces:
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        #if len(faces) >= 2:
-            #print (str(len(faces)) + " faces detected")
-        if len(faces) == 0 and self.isZero == False:
-            if self.playPauseTimer == False:
-                self.isZero = True
-                self.timerRunning = True
-                #self.stopwatch(3),))
-                print("HEEEEE")
 
-                if self.timerProcess.is_alive():
-                    self.timerProcess.terminate()
-                    self.timerProcess  = Process(target=self.stopwatch, args=(2,))
-                if self.timerProcess.is_alive() == False:
-                    self.timerProcess  = Process(target=self.stopwatch, args=(2,))
-                    self.timerProcess.start()
-
-                #self.timerProcess.terminate()
-        elif len(faces) > 0:
-            self.isZero = False
-            self.timerRunning = False
-            if self.timerProcess.is_alive():
-                print("TERMINATE")
-                self.timerProcess.terminate()
-                self.timerProcess = Process(target=self.stopwatch, args=(2,))
-
-        # Display the resulting frame
-        cv2.imshow('Video', frame)
-        # When everything is done, release the capture
-    def gestureRecognizer(self):
-        ret, img = self.video_capture.read()
 
          # Capture frame-by-frame
         print self.timerProcess.is_alive()
 
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         faces = self.faceCascade.detectMultiScale(
             gray,
             scaleFactor=1.1,
@@ -142,7 +102,7 @@ class UbiComp():
         )
         # Draw a rectangle around the faces
         for (x, y, w, h) in faces:
-            cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
+            cv2.rectangle(self.img, (x, y), (x+w, y+h), (0, 255, 0), 2)
         #if len(faces) >= 2:
             #print (str(len(faces)) + " faces detected")
         if len(faces) == 0 and self.isZero == False:
@@ -172,9 +132,11 @@ class UbiComp():
                 self.startVideo(2)
         # Display the resulting frame
 
+    def gestureRecognizer(self):
+
         # When everything is done, release the capture
-        cv2.rectangle(img,(300,300),(100,100),(0,255,0),0)
-        crop_img = img[100:300, 100:300]
+        cv2.rectangle(self.img,(300,300),(100,100),(0,255,0),0)
+        crop_img = self.img[100:300, 100:300]
         grey = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
         value = (35, 35)
         blurred = cv2.GaussianBlur(grey, value, 0)
@@ -217,23 +179,23 @@ class UbiComp():
             cv2.line(crop_img,start,end,[0,255,0],2)
             #cv2.circle(crop_img,far,5,[0,0,255],-1)
         if count_defects == 1:
-            cv2.putText(img,"Volume Down", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
+            cv2.putText(self.img,"Volume Down", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
             self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_DOWN])
         elif count_defects == 2:
-            cv2.putText(img, "Volume Up", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
+            cv2.putText(self.img, "Volume Up", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
             self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_UP])
         elif count_defects == 3:
-            cv2.putText(img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
+            cv2.putText(self.img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
             self.pauseAndStartVideo(2)
         elif count_defects == 4:
-            cv2.putText(img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
+            cv2.putText(self.img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
             self.pauseAndStartVideo(2)
         else:
-            cv2.putText(img,"Finger Control", (50,50),\
+            cv2.putText(self.img,"Finger Control", (50,50),\
                         cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
         #cv2.imshow('drawing', drawing)
-        #cv2.imshow('end', crop_img)
-        cv2.imshow('Gesture', img)
+        #cv2.imshow('end', crop_self.img)
+        cv2.imshow('Gesture', self.img)
         all_img = np.hstack((drawing, crop_img))
         cv2.imshow('Contours', all_img)
 
