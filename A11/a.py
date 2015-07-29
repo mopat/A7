@@ -28,17 +28,20 @@ class UbiComp():
         self.infoTextBox()
         #start_new_thread(self.speechRecognition, (2,))
         #self.sn = Sniffer()
-        while True:
-            #if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
-            self.gestureRecognizer()
-            #if self.playPauseTimer == False:
-                #    self.gestureRecognizer()
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-            k = cv2.waitKey(10)
-            if k == 27:
-                break
-            time.sleep(0.05)
+        try:
+            while True:
+                #if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
+                self.gestureRecognizer()
+                #if self.playPauseTimer == False:
+                    #    self.gestureRecognizer()
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+                k = cv2.waitKey(10)
+                if k == 27:
+                    break
+        except KeyboardInterrupt:
+            pass
+            #time.sleep(0.05)
     def speechRecognition(self, i):
         while True:
             r = sr.Recognizer()
@@ -59,19 +62,17 @@ class UbiComp():
                 print("Could not understand audio")
 
     def stopwatch(self, seconds):
-        if self.timerRunning == True:
-            start = time.time()
-            time.clock()
-            elapsed = 0
-            while elapsed < seconds:
-                elapsed = time.time() - start
-                #print elapsed
-                #print "loop cycle time: %f, seconds count: %02d" % (time.clock() , elapsed)
-            if elapsed == seconds:
-                print "Pause"
 
-                self.device.emit_click(uinput.KEY_SPACE)
-                    #self.pauseVideo(2)
+        start = time.time()
+        time.clock()
+        elapsed = 0
+        while elapsed < seconds:
+            elapsed = time.time() - start
+            #print elapsed
+            #print "loop cycle time: %f, seconds count: %02d" % (time.clock() , elapsed)
+        if elapsed == seconds:
+            print "Pause"
+            self.device.emit_click(uinput.KEY_SPACE)
 
 
 
@@ -80,7 +81,7 @@ class UbiComp():
         root.title("Instructions")
         T = Text(root, height=20, width=150)
         T.pack()
-        T.insert(END, "VLC CONTROLLER\nStep 1: Open VLC Media Player\nStep 2: Use rectangle box to detect hand gestures\n1 Finger: ...\nClose Instructions to start")
+        T.insert(END, "VLC Controller is a simple controller for the popular VLC Media Player using face detection and finger recognition with you webcam.\nFunctions\nFace Detection: \n- pause video when no face is detected after three seconds\n- play when face is detected again\n\nFinger Recognition in the appropriate rectangle on the right of the opening webcam window:\n- two fingers: volume down\n- three fingers: volume up\n- four/five fingers: play/pause\n\nSteps\n1: start script ubicomp.py with sudo python ubicomp.py\n2: open VLC Media Player\n3: Drag and Drop Video in VLC\n4: use rectangle box to recognize finger count \n5: use face detection\n\nCLOSE INSTRUCTIONS TO START! Have fun!\nKill application: CTRL + C")
         mainloop()
     def faceDetector(self):
         # Capture frame-by-frame
@@ -122,8 +123,6 @@ class UbiComp():
                 self.timerProcess.terminate()
                 self.timerProcess = Process(target=self.stopwatch, args=(2,))
 
-            if self.playPauseTimer == True:
-                self.startVideo(2)
         # Display the resulting frame
         cv2.imshow('Video', frame)
         # When everything is done, release the capture
@@ -237,6 +236,7 @@ class UbiComp():
         cv2.imshow('Gesture', img)
         all_img = np.hstack((drawing, crop_img))
         cv2.imshow('Contours', all_img)
+
     def pauseAndStartVideo(self, sec):
         self.device.emit_click(uinput.KEY_SPACE)
         self.playPauseTimer = True
@@ -244,19 +244,9 @@ class UbiComp():
         time.sleep(sec)
         self.video_capture = cv2.VideoCapture(0)
         self.playPauseTimer = False
-    def pauseVideo(self, sec):
-        self.device.emit_click(uinput.KEY_SPACE)
-        self.playPauseTimer = True
-        self.video_capture.release()
-        time.sleep(sec)
-        self.video_capture = cv2.VideoCapture(0)
-    def startVideo(self, sec):
-        self.device.emit_click(uinput.KEY_SPACE)
-        self.playPauseTimer = False
-        self.video_capture.release()
-        time.sleep(sec)
-        self.video_capture = cv2.VideoCapture(0)
+
     def getCurrentWindow(self):
         return Sniffer.get_cur_window(Sniffer())[2]
+
 if __name__ == '__main__':
     uc = UbiComp()
