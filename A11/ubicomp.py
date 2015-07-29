@@ -66,22 +66,22 @@ class UbiComp():
                 print("Could not understand audio")
 
     def stopwatch(self, seconds):
-
-        start = time.time()
-        time.clock()
-        elapsed = 0
-        while elapsed < seconds & self.timerRunning == True:
-            #self.playPauseTimer = False
-            elapsed = time.time() - start
-            #print elapsed
-            #print "loop cycle time: %f, seconds count: %02d" % (time.clock() , elapsed)
-            #self.device.emit_click(uinput.KEY_SPACE)
-        if elapsed == seconds:
-            print "Pause"
-            self.playPauseTimer = True
-            self.isZero = False
-            self.timerRunning = False
-            #self.pauseAndStartVideo(2)
+        if self.timerRunning == True:
+            start = time.time()
+            time.clock()
+            elapsed = 0
+            while elapsed < seconds:
+                #self.playPauseTimer = False
+                elapsed = time.time() - start
+                #print elapsed
+                #print "loop cycle time: %f, seconds count: %02d" % (time.clock() , elapsed)
+                #self.device.emit_click(uinput.KEY_SPACE)
+            if elapsed == seconds:
+                print "Pause"
+                #self.playPauseTimer = True
+                self.isZero = False
+                self.timerRunning = False
+                self.pauseAndStartVideo(2)
 
 
     def infoTextBox(self):
@@ -112,14 +112,13 @@ class UbiComp():
         #if len(faces) >= 2:
             #print (str(len(faces)) + " faces detected")
 
-        if len(faces) == 0 & self.playPauseTimer == False & self.isZero == False:
-            #self.pauseAndStartVideo(2)
-            self.isZero = True
-            self.timerRunning = True
-            self.stopwatch(1)
-            return
+        if len(faces) == 0 & self.isZero == False:
+            if self.playPauseTimer == False:
+                self.isZero = True
+                self.timerRunning = True
+                self.stopwatch(3)
 
-        if len(faces) > 0 & self.timerRunning == True:
+        if len(faces) > 0:
             #self.isZero = False
             print "switch zero"
             self.timerRunning = False
