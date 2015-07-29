@@ -5,7 +5,7 @@ import math
 import time
 import uinput
 import speech_recognition as sr
-from sniff_x import Sniffer
+#from sniff_x import Sniffer
 from Tkinter import *
 from thread import start_new_thread
 
@@ -16,6 +16,8 @@ class UbiComp():
         self.cascPath = "haarcascade_frontalface_default.xml"
         self.faceCascade = cv2.CascadeClassifier(self.cascPath)
         self.playPauseTimer = False
+        self.isZero = False
+        self.timerRunning = False
         self.device = uinput.Device([
             uinput.KEY_SPACE,
             uinput.KEY_LEFTCTRL,
@@ -26,14 +28,14 @@ class UbiComp():
         self.VLC_KEY = "VLC media player"
         self.infoTextBox()
 
-        start_new_thread(self.speechRecognition, (2,))
-        self.sn = Sniffer()
+        #start_new_thread(self.speechRecognition, (2,))
+        #self.sn = Sniffer()
         while True:
 
-            if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
-                self.faceDetector()
-                if self.playPauseTimer == False:
-                    self.gestureRecognizer()
+            #if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
+            self.faceDetector()
+            #if self.playPauseTimer == False:
+                #    self.gestureRecognizer()
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -62,6 +64,24 @@ class UbiComp():
                 print("You said: " + voice)    # recognize speech using Google Speech Recognition
             except LookupError:                            # speech is unintelligible
                 print("Could not understand audio")
+
+    def stopwatch(self, seconds):
+
+        start = time.time()
+        time.clock()
+        elapsed = 0
+        while elapsed < seconds & self.timerRunning == True:
+            #self.playPauseTimer = False
+            elapsed = time.time() - start
+            #print elapsed
+            #print "loop cycle time: %f, seconds count: %02d" % (time.clock() , elapsed)
+            #self.device.emit_click(uinput.KEY_SPACE)
+        if elapsed == seconds:
+            print "Pause"
+            self.playPauseTimer = True
+            self.isZero = False
+            self.timerRunning = False
+            #self.pauseAndStartVideo(2)
 
 
     def infoTextBox(self):
@@ -92,15 +112,17 @@ class UbiComp():
         #if len(faces) >= 2:
             #print (str(len(faces)) + " faces detected")
 
-        if len(faces) == 0 & self.playPauseTimer == False:
-            self.device.emit_click(uinput.KEY_SPACE)
-            self.pauseAndStartVideo(2)
+        if len(faces) == 0 & self.playPauseTimer == False & self.isZero == False:
+            #self.pauseAndStartVideo(2)
+            self.isZero = True
+            self.timerRunning = True
+            self.stopwatch(1)
             return
 
-        """if len(faces) > 0 & self.playPauseTimer == True:
-            self.device.emit_click(uinput.KEY_SPACE)
-            self.pauseAndStartVideo(2)
-            return"""
+        if len(faces) > 0 & self.timerRunning == True:
+            #self.isZero = False
+            print "switch zero"
+            self.timerRunning = False
 
         # Display the resulting frame
         cv2.imshow('Video', frame)
