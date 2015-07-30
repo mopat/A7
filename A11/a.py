@@ -17,6 +17,7 @@ class UbiComp():
         self.playPauseTimer = False
         self.isZero = False
         self.timerProcess = Process(target=self.stopwatch, args=(2,))
+        self.timerProcess_2 = Process(target=self.stopwatch, args=(3,))
         self.device = uinput.Device([
             uinput.KEY_SPACE,
             uinput.KEY_LEFTCTRL,
@@ -108,10 +109,11 @@ class UbiComp():
                     self.timerProcess.terminate()
                     self.timerProcess  = Process(target=self.stopwatch, args=(2,))
                     self.playPauseTimer = False
-                if self.timerProcess.is_alive() == False:
+                if self.timerProcess.is_alive() == False & self.playPauseTimer == False:
                     self.timerProcess  = Process(target=self.stopwatch, args=(2,))
                     self.timerProcess.start()
-                    self.changePlayPause()
+                    self.playPauseTimer = True
+
 
         elif len(faces) > 0:
             self.isZero = False
@@ -121,10 +123,14 @@ class UbiComp():
                 self.timerProcess = Process(target=self.stopwatch, args=(2,))
                 self.playPauseTimer = False
 
+
             if self.playPauseTimer == True:
-                 self.timerProcess  = Process(target=self.stopwatch, args=(2,))
-                 self.timerProcess.start()
-                 self.changePlayPause()
+                 self.timerProcess_2  = Process(target=self.stopwatch, args=(3,))
+                 #self.device.emit_click(uinput.KEY_SPACE)
+                 self.timerProcess_2.start()
+
+                 self.playPauseTimer = False
+
         # Display the resulting frame
 
     def gestureRecognizer(self):
