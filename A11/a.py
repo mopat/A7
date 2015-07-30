@@ -18,6 +18,7 @@ class UbiComp():
         self.isZero = False
         self.timerProcess = Process(target=self.stopwatch, args=(2,))
         self.timerProcess_2 = Process(target=self.stopwatch, args=(3,))
+        self.timerProcess_3 = Process(target=self.gestureWatch, args=(2,))
         self.device = uinput.Device([
             uinput.KEY_SPACE,
             uinput.KEY_LEFTCTRL,
@@ -76,6 +77,17 @@ class UbiComp():
             self.device.emit_click(uinput.KEY_SPACE)
         #print self.playPauseTimer
 
+    def gestureWatch (self, seconds):
+        start = time.time()
+        time.clock()
+        elapsed = 0
+        while elapsed < seconds:
+            elapsed = time.time() - start
+
+        if elapsed == seconds:
+            print "Gesture done"
+            return
+
     def infoTextBox(self):
         root = Tk()
         root.title("Instructions")
@@ -118,7 +130,7 @@ class UbiComp():
         elif len(faces) > 0:
             self.isZero = False
             if self.timerProcess.is_alive():
-                print("TERMINATE")
+                #print("TERMINATE")
                 self.timerProcess.terminate()
                 self.timerProcess = Process(target=self.stopwatch, args=(2,))
                 self.playPauseTimer = False
@@ -181,16 +193,16 @@ class UbiComp():
             #cv2.circle(crop_img,far,5,[0,0,255],-1)
         if count_defects == 1:
             cv2.putText(self.img,"Volume Down", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            self.volumeDown(0.5)
+            self.volumeDown(1)
         elif count_defects == 2:
             cv2.putText(self.img, "Volume Up", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
-            self.volumeUp(0.5)
+            self.volumeUp(1)
         elif count_defects == 3:
             cv2.putText(self.img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            self.pauseAndStartVideo(1)
+            self.pauseAndStartVideo(2)
         elif count_defects == 4:
             cv2.putText(self.img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            self.pauseAndStartVideo(1)
+            self.pauseAndStartVideo(2)
         else:
             cv2.putText(self.img,"Finger Control", (50,50),\
                         cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
@@ -201,26 +213,31 @@ class UbiComp():
         cv2.imshow('Contours', all_img)
 
     def volumeUp(self, sec):
-        for i in range (2):
-            self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_UP])
-        self.video_capture.release()
-        time.sleep(sec)
-        self.video_capture = cv2.VideoCapture(0)
+        self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_UP])
+        self.runGestureTimer(sec)
 
     def volumeDown(self, sec):
-        for i in range (2):
-            self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_DOWN])
-        self.video_capture.release()
-        time.sleep(sec)
-        self.video_capture = cv2.VideoCapture(0)
+        self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_DOWN])
+        self.runGestureTimer(sec)
 
     def pauseAndStartVideo(self, sec):
         self.device.emit_click(uinput.KEY_SPACE)
         self.playPauseTimer = True
-        self.video_capture.release()
-        time.sleep(sec)
-        self.video_capture = cv2.VideoCapture(0)
+        #self.video_capture.release()
+        #time.sleep(sec)
+        #self.video_capture = cv2.VideoCapture(0)
         self.playPauseTimer = False
+
+        self.runGestureTimer(sec)
+
+    def runGestureTimer(self, seconds):
+        if self.timerProcess_3.is_alive():
+                self.timerProcess_3.terminate()
+                self.timerProcess_3  = Process(target=self.gestureWatch, args=(seconds,))
+
+        if self.timerProcess_3.is_alive() == False:
+                self.timerProcess_3  = Process(target=self.gestureWatch, args=(seconds,))
+                self.timerProcess_3.start()
 
     def getCurrentWindow(self):
         return Sniffer.get_cur_window(Sniffer())[2]
