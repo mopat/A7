@@ -222,11 +222,10 @@ class UbiComp():
 
     def pauseAndStartVideo(self, sec):
         self.device.emit_click(uinput.KEY_SPACE)
-        self.playPauseTimer = True
-        #self.video_capture.release()
-        #time.sleep(sec)
-        #self.video_capture = cv2.VideoCapture(0)
-        self.playPauseTimer = False
+        if self.playPauseTimer == True:
+            self.playPauseTimer = False
+        else:
+            self.playPauseTimer = True
 
         self.runGestureTimer(sec)
 
