@@ -16,6 +16,7 @@ class UbiComp():
         self.faceCascade = cv2.CascadeClassifier(self.cascPath)
         self.playPauseTimer = False
         self.isZero = False
+        self.gestureArray = []
         self.timerProcess = Process(target=self.stopwatch, args=(2,))
         self.timerProcess_2 = Process(target=self.stopwatch, args=(3,))
         self.timerProcess_3 = Process(target=self.gestureWatch, args=(2,))
@@ -78,12 +79,6 @@ class UbiComp():
         #print self.playPauseTimer
 
     def gestureWatch (self, seconds, gesture):
-        if gesture == "volumeUp":
-            self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_UP])
-        elif gesture ==  "volumeDown":
-            self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_DOWN])
-        elif gesture == "PlayPause":
-            self.device.emit_click(uinput.KEY_SPACE)
 
         start = time.time()
         time.clock()
@@ -93,6 +88,12 @@ class UbiComp():
 
         if elapsed == seconds:
             print "Gesture done"
+            if gesture == "volumeUp":
+                self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_UP])
+            elif gesture ==  "volumeDown":
+                self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_DOWN])
+            elif gesture == "PlayPause":
+                self.device.emit_click(uinput.KEY_SPACE)
             print gesture
             return
 
@@ -241,9 +242,14 @@ class UbiComp():
         #print "pause/play"
 
     def runGestureTimer(self, seconds, gesture):
-        """if self.timerProcess_3.is_alive():
-                self.timerProcess_3.terminate()
-                self.timerProcess_3  = Process(target=self.gestureWatch, args=(seconds,))"""
+
+        self.gestureArray.append(gesture)
+        #print self.gestureArray
+        if self.timerProcess_3.is_alive():
+            if self.gestureArray[-2] != gesture:
+                    self.timerProcess_3.terminate()
+                    self.timerProcess_3  = Process(target=self.gestureWatch, args=(seconds,))
+                    print "gesture terminated"
 
         if self.timerProcess_3.is_alive() == False:
                 self.timerProcess_3  = Process(target=self.gestureWatch, args=(seconds, gesture,))
