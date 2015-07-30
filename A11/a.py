@@ -81,11 +81,13 @@ class UbiComp():
         start = time.time()
         time.clock()
         elapsed = 0
+        self.video_capture.release()
         while elapsed < seconds:
             elapsed = time.time() - start
 
         if elapsed == seconds:
             print "Gesture done"
+            self.video_capture = cv2.VideoCapture(0)
             return
 
     def infoTextBox(self):
