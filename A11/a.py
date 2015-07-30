@@ -73,7 +73,7 @@ class UbiComp():
             elapsed = time.time() - start
 
         if elapsed == seconds:
-            print "Play/Pause"
+            print "Play/Pause because of zero faces"
             self.device.emit_click(uinput.KEY_SPACE)
         #print self.playPauseTimer
 
@@ -199,18 +199,15 @@ class UbiComp():
             #dist = cv2.pointPolygonTest(cnt,far,True)
             cv2.line(crop_img,start,end,[0,255,0],2)
             #cv2.circle(crop_img,far,5,[0,0,255],-1)
-        if count_defects == 1:
+        if count_defects == 2:
             cv2.putText(self.img,"Volume Down", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            self.volumeDown(3)
-        elif count_defects == 2:
-            cv2.putText(self.img, "Volume Up", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
-            self.volumeUp(3)
+            self.volumeDown(2)
         elif count_defects == 3:
-            cv2.putText(self.img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            self.pauseAndStartVideo(3)
+            cv2.putText(self.img, "Volume Up", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
+            self.volumeUp(2)
         elif count_defects == 4:
             cv2.putText(self.img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            self.pauseAndStartVideo(3)
+            self.pauseAndStartVideo(2)
         else:
             cv2.putText(self.img,"Finger Control", (50,50),\
                         cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
@@ -235,10 +232,10 @@ class UbiComp():
     def pauseAndStartVideo(self, sec):
         gesture = "PlayPause"
         #self.device.emit_click(uinput.KEY_SPACE)
-        if self.playPauseTimer == True:
-            self.playPauseTimer = False
-        else:
-            self.playPauseTimer = True
+        #if self.playPauseTimer == True:
+            #self.playPauseTimer = False
+        #else:
+            #self.playPauseTimer = True
 
         self.runGestureTimer(sec, gesture)
         #print "pause/play"
