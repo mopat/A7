@@ -16,7 +16,6 @@ class UbiComp():
         self.faceCascade = cv2.CascadeClassifier(self.cascPath)
         self.playPauseTimer = False
         self.isZero = False
-        self.timerRunning = False
         self.timerProcess = Process(target=self.stopwatch, args=(2,))
         self.device = uinput.Device([
             uinput.KEY_SPACE,
@@ -74,11 +73,7 @@ class UbiComp():
         if elapsed == seconds:
             print "Play/Pause"
             self.device.emit_click(uinput.KEY_SPACE)
-            if self.playPauseTimer == True:
-                self.playPauseTimer == False
-            else:
-                self.playPauseTimer == True
-
+        #print self.playPauseTimer
 
     def infoTextBox(self):
         root = Tk()
@@ -89,6 +84,7 @@ class UbiComp():
         mainloop()
     def faceDetector(self):
 
+        #print self.playPauseTimer
 
          # Capture frame-by-frame
 
@@ -107,25 +103,28 @@ class UbiComp():
         if len(faces) == 0 and self.isZero == False:
             if self.playPauseTimer == False:
                 self.isZero = True
-                self.timerRunning = True
 
                 if self.timerProcess.is_alive():
                     self.timerProcess.terminate()
                     self.timerProcess  = Process(target=self.stopwatch, args=(2,))
+                    self.playPauseTimer = False
                 if self.timerProcess.is_alive() == False:
                     self.timerProcess  = Process(target=self.stopwatch, args=(2,))
                     self.timerProcess.start()
+                    self.changePlayPause()
 
         elif len(faces) > 0:
             self.isZero = False
-            self.timerRunning = False
             if self.timerProcess.is_alive():
                 print("TERMINATE")
                 self.timerProcess.terminate()
                 self.timerProcess = Process(target=self.stopwatch, args=(2,))
+                self.playPauseTimer = False
 
             if self.playPauseTimer == True:
-                self.startVideo(2)
+                 self.timerProcess  = Process(target=self.stopwatch, args=(2,))
+                 self.timerProcess.start()
+                 self.changePlayPause()
         # Display the resulting frame
 
     def gestureRecognizer(self):
@@ -202,6 +201,13 @@ class UbiComp():
         time.sleep(sec)
         self.video_capture = cv2.VideoCapture(0)
         self.playPauseTimer = False
+
+    def changePlayPause(self):
+        if self.playPauseTimer == True:
+            self.playPauseTimer = False
+        else:
+            self.playPauseTimer = True
+        print self.playPauseTimer
 
     def getCurrentWindow(self):
         return Sniffer.get_cur_window(Sniffer())[2]
