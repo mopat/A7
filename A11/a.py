@@ -4,22 +4,29 @@ import numpy as np
 import math
 import time
 import uinput
-import speech_recognition as sr
-#from sniff_x import Sniffer
+from sniff_x import Sniffer
 from Tkinter import *
-from thread import start_new_thread
+
 from multiprocessing import Process
 class UbiComp():
     def __init__(self):
-        self.video_capture = cv2.VideoCapture(0)
+        self.video_capture = cv2.VideoCapture(0)  # capture video from webcam
         self.cascPath = "haarcascade_frontalface_default.xml"
         self.faceCascade = cv2.CascadeClassifier(self.cascPath)
+
+
         self.playPauseTimer = False
         self.isZero = False
+
+        # array to save gesture
         self.gestureArray = []
+
+        # multiple timers using multiprocessing tho prevent performance issues
         self.timerProcess = Process(target=self.stopwatch, args=(2,))
         self.timerProcess_2 = Process(target=self.stopwatch, args=(3,))
         self.timerProcess_3 = Process(target=self.gestureWatch, args=(2,))
+
+        # setup key simulation
         self.device = uinput.Device([
             uinput.KEY_SPACE,
             uinput.KEY_LEFTCTRL,
@@ -27,18 +34,19 @@ class UbiComp():
             uinput.KEY_DOWN
         ])
         self.VLC_KEY = "VLC media player"
+
+        # sho instructions
         self.infoTextBox()
-        #start_new_thread(self.speechRecognition, (2,))
-        #self.sn = Sniffer()
+
+        # start while true loop
         try:
             while True:
                 self.ret, self.img = self.video_capture.read()
-                #if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
-                self.faceDetector()
-                self.gestureRecognizer()
+                if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
+                    if len(sys.argv) > 1 and sys.argv[1] == "faces":
+                        self.faceDetector()
+                    self.gestureRecognizer()
 
-                #if self.playPauseTimer == False:
-                    #    self.gestureRecognizer()
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
                 k = cv2.waitKey(10)
@@ -46,26 +54,8 @@ class UbiComp():
                     break
         except KeyboardInterrupt:
             pass
-            #time.sleep(0.05)
-    def speechRecognition(self, i):
-        while True:
-            r = sr.Recognizer()
-            with sr.Microphone() as source:                # use the default microphone as the audio source
-                audio = r.listen(source)                   # listen for the first phrase and extract it into audio data
-            try:
-                voice = r.recognize(audio)
-                if voice == "play" or voice == "stop":
-                    self.device.emit_click(uinput.KEY_SPACE)
-                elif voice == "volume up":
-                    for i in range(5):
-                        self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_UP])
-                elif voice == "volume down":
-                    for i in range(5):
-                        self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_DOWN])
-                print("You said: " + voice)    # recognize speech using Google Speech Recognition
-            except LookupError:                            # speech is unintelligible
-                print("Could not understand audio")
 
+    # stopwatch to emit space key
     def stopwatch(self, seconds):
         start = time.time()
         time.clock()
@@ -74,42 +64,43 @@ class UbiComp():
             elapsed = time.time() - start
 
         if elapsed == seconds:
-            print "Play/Pause because of zero faces"
             self.device.emit_click(uinput.KEY_SPACE)
-        #print self.playPauseTimer
 
+
+    # timer to emit key combinations for vol up and minus
     def gestureWatch (self, seconds, gesture):
-
         start = time.time()
         time.clock()
         elapsed = 0
         while elapsed < seconds:
             elapsed = time.time() - start
 
+        # the emitted combos are emitted twice to regulate volume by 10 percent up and down
         if elapsed == seconds:
             print "Gesture done"
             if gesture == "volumeUp":
                 self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_UP])
+                self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_UP])
             elif gesture ==  "volumeDown":
+                self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_DOWN])
                 self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_DOWN])
             elif gesture == "PlayPause":
                 self.device.emit_click(uinput.KEY_SPACE)
             print gesture
             return
 
+    # show insturctions before starting the main application
     def infoTextBox(self):
         root = Tk()
         root.title("Instructions")
         T = Text(root, height=20, width=150)
         T.pack()
-        T.insert(END, "VLC Controller is a simple controller for the popular VLC Media Player using face detection and finger recognition with you webcam.\nFunctions\nFace Detection: \n- pause video when no face is detected after three seconds\n- play when face is detected again\n\nFinger Recognition in the appropriate rectangle on the right of the opening webcam window:\n- two fingers: volume down\n- three fingers: volume up\n- four/five fingers: play/pause\n\nSteps\n1: start script ubicomp.py with sudo python ubicomp.py\n2: open VLC Media Player\n3: Drag and Drop Video in VLC\n4: use rectangle box to recognize finger count \n5: use face detection\n\nCLOSE INSTRUCTIONS TO START! Have fun!\nKill application: CTRL + C")
+        T.insert(END, "VLC Controller is a simple controller for the popular VLC Media Player using face detection and finger recognition with you webcam.\nFunctions\nFace Detection: \n- pause video when no face is detected after three seconds\n- play when face is detected again\n\nFinger Recognition in the appropriate rectangle on the right of the opening webcam window:\n- three fingers: volume down\n- four fingers: volume up\n- five fingers: play/pause\n\nSteps\n1: start script ubicomp.py with sudo python ubicomp.py\n2: open VLC Media Player\n3: Drag and Drop Video in VLC\n4: use rectangle box to recognize finger count \n5: use face detection\n\nCLOSE INSTRUCTIONS TO START! Have fun!\nKill application: CTRL + C")
         mainloop()
+
+    # face detector used to pause and play video
     def faceDetector(self):
-
-        #print self.playPauseTimer
-
          # Capture frame-by-frame
-
         gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         faces = self.faceCascade.detectMultiScale(
             gray,
@@ -122,6 +113,8 @@ class UbiComp():
         for (x, y, w, h) in faces:
             cv2.rectangle(self.img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
+        # check if faces are detected and start timer when no faces is detected
+        # terminate timer process when a face is detected again
         if len(faces) == 0 and self.isZero == False:
             if self.playPauseTimer == False:
                 self.isZero = True
@@ -135,28 +128,26 @@ class UbiComp():
                     self.timerProcess.start()
                     self.playPauseTimer = True
 
-
+        # terminate timer process when a face is detected again
         elif len(faces) > 0:
             self.isZero = False
+
+            # terminate timer process and reset
             if self.timerProcess.is_alive():
-                #print("TERMINATE")
                 self.timerProcess.terminate()
                 self.timerProcess = Process(target=self.stopwatch, args=(2,))
                 self.playPauseTimer = False
 
-
+            # reset timer process and start
             if self.playPauseTimer == True:
                  self.timerProcess_2  = Process(target=self.stopwatch, args=(3,))
-                 #self.device.emit_click(uinput.KEY_SPACE)
                  self.timerProcess_2.start()
-
                  self.playPauseTimer = False
 
-        # Display the resulting frame
 
+    # recognize gestures by finger count
+    # this algorithm doesn't count the number of fingers. It counts the spaces between the fingers.
     def gestureRecognizer(self):
-
-        # When everything is done, release the capture
         cv2.rectangle(self.img,(300,300),(100,100),(0,255,0),0)
         crop_img = self.img[100:300, 100:300]
         grey = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
@@ -197,65 +188,58 @@ class UbiComp():
             if angle <= 90:
                 count_defects += 1
                 cv2.circle(crop_img,far,1,[0,0,255],-1)
-            #dist = cv2.pointPolygonTest(cnt,far,True)
             cv2.line(crop_img,start,end,[0,255,0],2)
-            #cv2.circle(crop_img,far,5,[0,0,255],-1)
+
+        # start actions when number of fingers is recognized
         if count_defects == 2:
             cv2.putText(self.img,"Volume Down", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-            self.volumeDown(2)
+            self.volumeDown(1)
         elif count_defects == 3:
             cv2.putText(self.img, "Volume Up", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
-            self.volumeUp(2)
+            self.volumeUp(1)
         elif count_defects == 4:
             cv2.putText(self.img,"Play/Pause", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
             self.pauseAndStartVideo(2)
         else:
             cv2.putText(self.img,"Finger Control", (50,50),\
                         cv2.FONT_HERSHEY_SIMPLEX, 2, 2)
-        #cv2.imshow('drawing', drawing)
-        #cv2.imshow('end', crop_self.img)
         cv2.imshow('Gesture', self.img)
         all_img = np.hstack((drawing, crop_img))
+
+        # Display the resulting frame
         cv2.imshow('Contours', all_img)
 
+    # start volume up gesture and timer
     def volumeUp(self, sec):
         gesture = "volumeUp"
-        #self.device.emi  t_combo([uinput.KEY_LEFTCTRL, uinput.KEY_UP])
         self.runGestureTimer(sec, gesture)
-        #print "volume up"
 
+    # start volume down gesture and timer
     def volumeDown(self, sec):
         gesture = "volumeDown"
-        #self.device.emit_combo([uinput.KEY_LEFTCTRL, uinput.KEY_DOWN])
         self.runGestureTimer(sec, gesture)
-        #print "volume down"
 
+    # start volume play/pause gesture and timer
     def pauseAndStartVideo(self, sec):
         gesture = "PlayPause"
-        #self.device.emit_click(uinput.KEY_SPACE)
-        #if self.playPauseTimer == True:
-            #self.playPauseTimer = False
-        #else:
-            #self.playPauseTimer = True
-
         self.runGestureTimer(sec, gesture)
-        #print "pause/play"
 
+    # timer to prevent false recognition of gestures.
+    # the gesture must be the same for some seconds. else the gesture action will not be started.
     def runGestureTimer(self, seconds, gesture):
-
+        print "current detected gesture:"  + gesture
         self.gestureArray.append(gesture)
-        #print self.gestureArray
         if self.timerProcess_3.is_alive():
             if self.gestureArray[-2] != gesture:
                     self.timerProcess_3.terminate()
                     self.timerProcess_3  = Process(target=self.gestureWatch, args=(seconds,))
-                    print "gesture terminated"
+                    print "gesture aborted"
 
         if self.timerProcess_3.is_alive() == False:
                 self.timerProcess_3  = Process(target=self.gestureWatch, args=(seconds, gesture,))
                 self.timerProcess_3.start()
 
-
+    # get current window name
     def getCurrentWindow(self):
         return Sniffer.get_cur_window(Sniffer())[2]
 
