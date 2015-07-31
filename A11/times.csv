@@ -1,0 +1,17 @@
+participant,task,time_in_ms,technique
+1,1,2410,quo
+1,2,4090,quo
+1,3,3750,quo
+1,4,2250,quo
+2,1,1720,quo
+2,2,3580,quo
+2,3,3790,quo
+2,4,2240,quo
+3,1,2520,quo
+3,2,3290,quo
+3,3,3160,quo
+3,4,2050,quo
+4,1,2100,quo
+4,2,2890,quo
+4,3,3040,quo
+4,4,2760,quo
