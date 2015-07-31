@@ -13,7 +13,9 @@ What are ethical implications of the Ubiquitous Computing paradigm?
     equivalent of fingerprints".
 
 “The future is already here — it’s just not very evenly distributed.” (William Gibson). Describe two examples where UbiComp has already entered everyday life.
-As Weiser defined the term ubiquitous computing, the user is not allowed to interact with the device. The computer must be in background and invisible. As mentioned before, this happens when
-a person is wearing the smartphone in his trouser pocket and a GPS tracking or step counter application is active. The computer is working in background and there is no need for the
-person to count the steps himself or track his walk.
+    As Weiser defined the term ubiquitous computing, the user is not allowed to interact with the device. The computer must be in background and invisible.
+    As mentioned before, this happens when a person is wearing the smartphone in his trouser pocket and a GPS tracking or step counter application is active.
+    The computer is working in background and there is no need for the person to count the steps himself or track his walk.
+    A second example is voice control in a car. The user is able to control the car's bordcomputer using voice recognition.
+    So it's possible to control volume, call somebody or navigate somewhere.
 
