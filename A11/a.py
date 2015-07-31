@@ -33,13 +33,14 @@ class UbiComp():
         ])
         self.VLC_KEY = "VLC media player"
 
-        # sho instructions
+        # show instructions
         self.infoTextBox()
 
         # start while true loop
         try:
             while True:
                 self.ret, self.img = self.video_capture.read()
+                # check if vlc is active window
                 if str(self.getCurrentWindow()).endswith(self.VLC_KEY):
                     if len(sys.argv) > 1 and sys.argv[1] == "faces":
                         self.faceDetector()
